@@ -1,6 +1,8 @@
 # Overview
 [![Pub Package](https://img.shields.io/pub/v/ffi_tool.svg)](https://pub.dartlang.org/packages/ffi_tool)
-[![GitHub Actions status](https://github.com/dart-interop/ffi_tool/workflows/Dart%20CI/badge.svg)](https://github.com/dart-interop/ffi_tool)
+<a href="https://github.com/terrier989/zone_local">
+ <img alt="GitHub Actions status" src="https://github.com/terrier989/zone_local/workflows/Dart%20CI/badge.svg">
+</a>
 
 This library helps developers to generate [dart:ffi](https://dart.dev/guides/libraries/c-interop)
 bindings.
