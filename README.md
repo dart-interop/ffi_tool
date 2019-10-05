@@ -7,9 +7,6 @@
 This library helps developers to generate [dart:ffi](https://dart.dev/guides/libraries/c-interop)
 bindings.
 
-When you generate bindings for an iOS / Mac OS X library that uses the reference counting, the
-generated bindings will use [cupertino_ffi](https://github.com/dart-interop/cupertino_ffi).
-
 ## Contributing
   * Create a pull request in [github.com/dart-interop/ffi_tool](https://github.com/dart-interop/ffi_tool).
   * You can also get Github push/admin permits by creating an issue.
@@ -25,6 +22,7 @@ dev_dependencies:
 Run `pub get`.
 
 ## Write a script
+### For C library
 Create a generator script in some file (example: "tool/generate_ffi.dart"):
 
 ```dart
@@ -58,7 +56,27 @@ final library = Library(
 );
 ```
 
-## Run it
+Run it:
 ```
 pub run tool/generate_ffi.dart
+```
+
+### For Objective-C library
+When you generate bindings for an iOS / Mac OS X library that uses the reference counting, the
+generated bindings will use [cupertino_ffi](https://github.com/dart-interop/cupertino_ffi).
+
+```dart
+import 'package:ffi_tool/objective_c.dart';
+
+void main() {
+  generateAll([
+    ObjcLibrary(
+      generatedPath: "example.dart",
+      productName: "Example Library",
+      uri: null,
+      libraryName: "example",
+      libraryPath: "/System/Library/Frameworks/CoreML.framework/Versions/Current/CoreML",
+    ),
+  ]);
+}
 ```

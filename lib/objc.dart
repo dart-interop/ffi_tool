@@ -18,4 +18,6 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-library ffi_tool.objective_c;
+library ffi_tool.objc;
+
+export 'src/objective_c/generate.dart';

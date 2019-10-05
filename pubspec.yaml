@@ -11,7 +11,7 @@ dependencies:
   meta: ^1.1.0
 
 dev_dependencies:
-  cupertino_ffi: any
+  cupertino_ffi: ^0.1.5
   ffi: ^0.1.1
   pedantic: ^1.8.0
   test: ^1.6.0

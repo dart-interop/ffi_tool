@@ -20,7 +20,7 @@
 
 library ffi_tool.c;
 
-export 'src/generate_file.dart';
-export 'src/library.dart';
-export 'src/func.dart';
-export 'src/global.dart';
+export 'src/c/generate_file.dart';
+export 'src/c/library.dart';
+export 'src/c/func.dart';
+export 'src/c/global.dart';
