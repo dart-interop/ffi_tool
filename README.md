@@ -1,19 +1,13 @@
 # Overview
-[![Pub Package](https://img.shields.io/pub/v/ffi_tool.svg)](https://pub.dartlang.org/packages/ffi_tool)
 <a href="https://github.com/terrier989/zone_local">
  <img alt="GitHub Actions status" src="https://github.com/terrier989/zone_local/workflows/Dart%20CI/badge.svg">
 </a>
 
 This library helps developers to generate [dart:ffi](https://dart.dev/guides/libraries/c-interop)
-bindings.
-
-## Contributing
-  * Create a pull request in [github.com/dart-interop/ffi_tool](https://github.com/dart-interop/ffi_tool).
-  * You can also get Github push/admin permits by creating an issue.
+bindings. You can contribute at [github.com/dart-interop/ffi_tool](https://github.com/dart-interop/ffi_tool).
 
 # Getting started
-## Add dependency
-In "pubspec.yaml":
+In "pubspec.yaml", add:
 ```yaml
 dev_dependencies:
   ffi_tool: ^0.1.0
@@ -21,9 +15,13 @@ dev_dependencies:
 
 Run `pub get`.
 
-## Write a script
-### For C library
-Create a generator script in some file (example: "tool/generate_ffi.dart"):
+You have to write a generator script (see examples below) in some file. For example,
+"tool/generate_example.dart".
+
+Run the script with `pub run tool/generate_example.dart`.
+
+# Generator scripts
+## C library
 
 ```dart
 import 'package:ffi_tool/c.dart';
@@ -56,14 +54,11 @@ final library = Library(
 );
 ```
 
-Run it:
-```
-pub run tool/generate_ffi.dart
-```
-
-### For Objective-C library
-When you generate bindings for an iOS / Mac OS X library that uses the reference counting, the
-generated bindings will use [cupertino_ffi](https://github.com/dart-interop/cupertino_ffi).
+## Objective-C library
+Objective-C supports reflection so we are able to generate APIs automatically. The generated
+libraries use [cupertino_ffi](https://github.com/dart-interop/cupertino_ffi) for reference counting.
+Please make sure you understand the reference counting patterns that you need to follow when you
+use the generated library.
 
 ```dart
 import 'package:ffi_tool/objective_c.dart';
@@ -71,11 +66,11 @@ import 'package:ffi_tool/objective_c.dart';
 void main() {
   generateAll([
     ObjcLibrary(
-      generatedPath: "example.dart",
-      productName: "Example Library",
-      uri: null,
+      productName: "Example",
+      uri: "https://github.com/example/project",
       libraryName: "example",
       libraryPath: "/System/Library/Frameworks/CoreML.framework/Versions/Current/CoreML",
+      generatedPath: "example.dart",
     ),
   ]);
 }

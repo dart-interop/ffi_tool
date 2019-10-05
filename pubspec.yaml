@@ -1,5 +1,5 @@
 name: ffi_tool
-version: 0.1.0
+version: 0.1.1
 description: Generates 'dart:ffi' bindings for C and Objective-C libraries.
 homepage: https://github.com/dart-interop/ffi_tool
 author: terrier989 <terrier989@gmail.com>
@@ -8,10 +8,10 @@ environment:
   sdk: '>=2.5.0 <3.0.0'
 
 dependencies:
+  cupertino_ffi: ^0.1.5
   meta: ^1.1.0
 
 dev_dependencies:
-  cupertino_ffi: ^0.1.5
   ffi: ^0.1.1
   pedantic: ^1.8.0
   test: ^1.6.0
