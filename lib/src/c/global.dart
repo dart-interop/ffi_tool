@@ -36,7 +36,7 @@ class Global extends Element {
     sb.write(
         "final $dartType $name = ${library.dynamicLibraryIdentifier}.lookup<$cType>(\n");
     sb.write("  \"$name\",\n");
-    sb.write(").load<$dartType>();\n");
+    sb.write(").value;\n");
     return sb.toString();
   }
 }

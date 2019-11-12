@@ -15,14 +15,14 @@ final library = Library(
     // A function
     Func(
       name: "Example",
-      parameterTypes: ["Int32", "Floa64", "*void", "void"],
-      returnType: "ReturnType",
+      parameterTypes: ["int32", "float64", "*void"],
+      returnType: "void",
     ),
 
     // A global
     Global(
       name: "ExampleGlobal",
-      type: "Int32",
+      type: "int32",
     ),
   ],
 );

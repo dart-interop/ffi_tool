@@ -72,9 +72,12 @@ class Func extends Element {
 
     // Lookup
     sb.write("/// C function '$name'.\n");
-    sb.write("${toDartType(returnType)} $name(\n");
-    for (var parameter in parameters) {
-      sb.write("  ${toDartType(parameter.type)} ${parameter.name},\n");
+    sb.write("${toDartType(returnType)} $name(");
+    if (parameters.isNotEmpty) {
+      sb.write("\n");
+      for (var parameter in parameters) {
+        sb.write("  ${toDartType(parameter.type)} ${parameter.name},\n");
+      }
     }
     sb.write(") {\n");
     if (arc) {

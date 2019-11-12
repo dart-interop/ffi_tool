@@ -6,6 +6,11 @@
 This library helps developers to generate [dart:ffi](https://dart.dev/guides/libraries/c-interop)
 bindings. You can contribute at [github.com/dart-interop/ffi_tool](https://github.com/dart-interop/ffi_tool).
 
+The advantages of using this package (instead of writing hand-written code) are:
+  * Often less boilerplate
+  * Often more readable (e.g. "*void" instead of "Pointer<Void>")
+  * Support for Apple's ARC
+
 # Getting started
 In "pubspec.yaml", add:
 ```yaml
@@ -41,8 +46,8 @@ final library = Library(
     // C function
     Func(
       name: "Example",
-      parameterTypes: ["Int32", "Floa64", "*void", "void"],
-      returnType: "ReturnType",
+      parameterTypes: ["int32", "float64", "*void"],
+      returnType: "void",
     ),
 
     // C global variable
@@ -52,26 +57,4 @@ final library = Library(
     ),
   ],
 );
-```
-
-## Objective-C library
-Objective-C supports reflection so we are able to generate APIs automatically. The generated
-libraries use [cupertino_ffi](https://github.com/dart-interop/cupertino_ffi) for reference counting.
-Please make sure you understand the reference counting patterns that you need to follow when you
-use the generated library.
-
-```dart
-import 'package:ffi_tool/objective_c.dart';
-
-void main() {
-  generateAll([
-    ObjcLibrary(
-      productName: "Example",
-      uri: "https://github.com/example/project",
-      libraryName: "example",
-      libraryPath: "/System/Library/Frameworks/CoreML.framework/Versions/Current/CoreML",
-      generatedPath: "example.dart",
-    ),
-  ]);
-}
 ```

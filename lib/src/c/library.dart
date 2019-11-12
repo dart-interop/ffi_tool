@@ -38,6 +38,9 @@ class Library {
     final sb = StringBuffer();
     sb.write("// AUTOMATICALLY GENERATED. DO NOT EDIT.\n");
     final imports = ({"dart:ffi"}..addAll(importedUris)).toList()..sort();
+    if (elements.any((e) => e is Func && e.arc)) {
+      imports.add("package:cupertino_ffi/objc.dart");
+    }
     for (var uri in imports) {
       sb.write("import '$uri';\n");
     }
