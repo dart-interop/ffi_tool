@@ -88,6 +88,45 @@ final Global1Type Global1 = dlForExampleLibrary.lookup<Global1Type>(
 """);
   });
 
+  test("Structs", () {
+    final library = Library(
+      dynamicLibraryIdentifier: "dlForExampleLibrary",
+      dynamicLibraryPath: "path/to/library",
+      importedUris: [],
+      elements: [
+        Struct(
+          name: "Coordinate",
+          members: <Member>[
+            Member(type: "double", name: "latitude"),
+            Member(type: "double", name: "longitude")
+          ],
+        ),
+      ],
+    );
+    expect(library.generateSource(), """
+// AUTOMATICALLY GENERATED. DO NOT EDIT.
+import \'dart:ffi\';
+
+/// Dynamic library
+final DynamicLibrary dlForExampleLibrary = DynamicLibrary.open(
+  "path/to/library",
+);
+
+class Coordinate extends Struct {
+  @Double()
+  double latitude;
+
+  @Double()
+  double longitude;
+
+  factory Coordinate.allocate(double latitude, double longitude) =>
+      allocate<Coordinate>().ref
+        ..latitude = latitude
+        ..longitude = longitude;
+}
+""");
+  });
+
   test("ARC", () {
     final library = Library(
       dynamicLibraryIdentifier: "dlForExampleLibrary",
