@@ -2,166 +2,180 @@ import 'package:ffi_tool/c.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("Functions", () {
+  test('Library defaults', () {
     final library = Library(
-      dynamicLibraryIdentifier: "dlForExampleLibrary",
-      dynamicLibraryPath: "path/to/library",
+      dynamicLibraryPath: '',
+      elements: [],
+    );
+    expect(library.dynamicLibraryIdentifier, '_dynamicLibrary');
+    expect(library.importedUris, <String>{});
+  });
+
+  test('Functions', () {
+    final library = Library(
+      dynamicLibraryIdentifier: 'dynamicLibraryForExampleLibrary',
+      dynamicLibraryPath: 'path/to/library',
       importedUris: [],
       elements: [
         Func(
-          name: "Example",
-          parameterTypes: ["Int32", "Floa64", "*void", "void"],
-          returnType: "ReturnType",
+          name: 'Example',
+          parameterTypes: ['Int32', 'Float32', '*void', 'void'],
+          returnType: 'ReturnType',
         ),
       ],
     );
-    expect(library.generateSource(), """
+    expect(library.toString(), '''
 // AUTOMATICALLY GENERATED. DO NOT EDIT.
-import \'dart:ffi\';
+
+import 'dart:ffi' as ffi;
 
 /// Dynamic library
-final DynamicLibrary dlForExampleLibrary = DynamicLibrary.open(
-  "path/to/library",
+final ffi.DynamicLibrary dynamicLibraryForExampleLibrary = ffi.DynamicLibrary.open(
+  'path/to/library',
 );
 
-/// C function \'Example\'.
+/// C function `Example`.
 ReturnType Example(
   int arg0,
-  Floa64 arg1,
-  Pointer arg2,
+  double arg1,
+  ffi.Pointer arg2,
   void arg3,
 ) {
   return _Example(arg0, arg1, arg2, arg3);
 }
-final _Example_Dart _Example = dlForExampleLibrary.lookupFunction<_Example_C, _Example_Dart>(
-  "Example",
+final _Example_Dart _Example = dynamicLibraryForExampleLibrary.lookupFunction<_Example_C, _Example_Dart>(
+  'Example',
 );
 typedef ReturnType _Example_C(
-  Int32 arg0,
-  Floa64 arg1,
-  Pointer arg2,
-  Void arg3,
+  ffi.Int32 arg0,
+  ffi.Float arg1,
+  ffi.Pointer arg2,
+  ffi.Void arg3,
 );
 typedef ReturnType _Example_Dart(
   int arg0,
-  Floa64 arg1,
-  Pointer arg2,
+  double arg1,
+  ffi.Pointer arg2,
   void arg3,
 );
-""");
+''');
   });
 
-  test("Globals", () {
+  test('Globals', () {
     final library = Library(
-      dynamicLibraryIdentifier: "dlForExampleLibrary",
-      dynamicLibraryPath: "path/to/library",
+      dynamicLibraryPath: 'path/to/library',
       importedUris: [],
       elements: [
         Global(
-          name: "Global0",
-          type: "Global0Type",
+          name: 'Global0',
+          type: 'Global0Type',
         ),
         Global(
-          name: "Global1",
-          type: "Global1Type",
+          name: 'Global1',
+          type: 'Global1Type',
         ),
       ],
     );
-    expect(library.generateSource(), """
+    expect(library.toString(), '''
 // AUTOMATICALLY GENERATED. DO NOT EDIT.
-import \'dart:ffi\';
+
+import 'dart:ffi' as ffi;
 
 /// Dynamic library
-final DynamicLibrary dlForExampleLibrary = DynamicLibrary.open(
-  "path/to/library",
+final ffi.DynamicLibrary _dynamicLibrary = ffi.DynamicLibrary.open(
+  'path/to/library',
 );
 
-/// C global \'Global0\'.
-final Global0Type Global0 = dlForExampleLibrary.lookup<Global0Type>(
-  "Global0",
+/// C global `Global0`.
+final Global0Type Global0 = _dynamicLibrary.lookup<Global0Type>(
+  'Global0',
 ).value;
 
-/// C global \'Global1\'.
-final Global1Type Global1 = dlForExampleLibrary.lookup<Global1Type>(
-  "Global1",
+/// C global `Global1`.
+final Global1Type Global1 = _dynamicLibrary.lookup<Global1Type>(
+  'Global1',
 ).value;
-""");
+''');
   });
 
-  test("Structs", () {
+  test('Structs', () {
     final library = Library(
-      dynamicLibraryIdentifier: "dlForExampleLibrary",
-      dynamicLibraryPath: "path/to/library",
+      dynamicLibraryIdentifier: 'dynamicLibraryForExampleLibrary',
+      dynamicLibraryPath: 'path/to/library',
       importedUris: [],
       elements: [
         Struct(
-          name: "Coordinate",
-          members: <Member>[
-            Member(type: "double", name: "latitude"),
-            Member(type: "double", name: "longitude")
+          name: 'Coordinate',
+          fields: <Field>[
+            Field(type: 'double', name: 'latitude'),
+            Field(type: 'double', name: 'longitude')
           ],
         ),
       ],
     );
-    expect(library.generateSource(), """
+    expect(library.toString(), '''
 // AUTOMATICALLY GENERATED. DO NOT EDIT.
-import \'dart:ffi\';
+
+import 'dart:ffi' as ffi;
+import 'package:ffi/ffi.dart' as ffi;
 
 /// Dynamic library
-final DynamicLibrary dlForExampleLibrary = DynamicLibrary.open(
-  "path/to/library",
+final ffi.DynamicLibrary dynamicLibraryForExampleLibrary = ffi.DynamicLibrary.open(
+  'path/to/library',
 );
 
-class Coordinate extends Struct {
-  @Double()
+/// C struct `Coordinate`.
+class Coordinate extends ffi.Struct {
+  
+  @ffi.Double()
   double latitude;
-
-  @Double()
+  
+  @ffi.Double()
   double longitude;
-
-  factory Coordinate.allocate(double latitude, double longitude) =>
-      allocate<Coordinate>().ref
-        ..latitude = latitude
-        ..longitude = longitude;
+  
+  static ffi.Pointer<Coordinate> allocate() {
+    return ffi.allocate<Coordinate>();
+  }
+  
 }
-""");
+''');
   });
 
-  test("ARC", () {
+  test('ARC', () {
     final library = Library(
-      dynamicLibraryIdentifier: "dlForExampleLibrary",
-      dynamicLibraryPath: "path/to/library",
+      dynamicLibraryPath: 'path/to/library',
       importedUris: [],
       elements: [
         Func(
-          name: "Example",
+          name: 'Example',
           parameterTypes: [],
-          returnType: "*void",
+          returnType: '*void',
           arc: true,
         ),
       ],
     );
-    expect(library.generateSource(), """
+    expect(library.toString(), '''
 // AUTOMATICALLY GENERATED. DO NOT EDIT.
-import \'dart:ffi\';
-import \'package:cupertino_ffi/objc.dart\';
+
+import 'dart:ffi' as ffi;
+import 'package:cupertino_ffi/objc.dart' as ffi;
 
 /// Dynamic library
-final DynamicLibrary dlForExampleLibrary = DynamicLibrary.open(
-  "path/to/library",
+final ffi.DynamicLibrary _dynamicLibrary = ffi.DynamicLibrary.open(
+  'path/to/library',
 );
 
-/// C function \'Example\'.
-Pointer Example() {
-  final _result = _Example();
-  arcAdd(_result);
-  return _result;
+/// C function `Example`.
+ffi.Pointer Example() {
+  final result = _Example();
+  arcAdd(result);
+  return result;
 }
-final _Example_Dart _Example = dlForExampleLibrary.lookupFunction<_Example_C, _Example_Dart>(
-  "Example",
+final _Example_Dart _Example = _dynamicLibrary.lookupFunction<_Example_C, _Example_Dart>(
+  'Example',
 );
-typedef Pointer _Example_C();
-typedef Pointer _Example_Dart();
-""");
+typedef ffi.Pointer _Example_C();
+typedef ffi.Pointer _Example_Dart();
+''');
   });
 }

@@ -1,7 +1,7 @@
 // Copyright (c) 2019 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
+// of this software and associated documentation files (the 'Software'), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
@@ -10,7 +10,7 @@
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 // IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -21,6 +21,7 @@
 import 'package:ffi_tool/c.dart';
 import 'package:meta/meta.dart';
 
+/// A definition for C function.
 class Func extends Element {
   /// Name of the function
   final String name;
@@ -29,16 +30,18 @@ class Func extends Element {
   final List<String> parameterTypes;
 
   /// Parameter names.
-  final List<String> parameterNames;
+  List<String> get parameterNames => parameters.map((p) => p.name).toList();
+
+  final List<String> _parameterNames;
 
   /// Parameters.
   List<Parameter> get parameters => List<Parameter>.generate(
         parameterTypes.length,
         (i) {
           final type = parameterTypes[i];
-          final name = (parameterNames != null && i < parameterNames.length)
-              ? parameterNames[i]
-              : "arg$i";
+          final name = (_parameterNames != null && i < _parameterNames.length)
+              ? _parameterNames[i]
+              : 'arg$i';
           return Parameter(type: type, name: name);
         },
       );
@@ -46,88 +49,92 @@ class Func extends Element {
   /// Return type.
   ///
   /// Examples:
-  ///   * "void"
-  ///   * "*CFData".
+  ///   * 'void'
+  ///   * '*CFData'.
   final String returnType;
 
-  /// Whether the return value should use reference counting?
-  ///
-  /// Reference counting is defined for Apple libraries only and uses
-  /// [cupertino_ffi](https://pub.dev/packages/cupertino_ffi).
+  /// Whether the return value should use Apple reference counting? The
+  /// implementation uses [cupertino_ffi](https://pub.dev/packages/cupertino_ffi).
   final bool arc;
 
-  Func({
+  const Func({
     @required this.name,
     @required this.parameterTypes,
-    this.parameterNames,
+    List<String> parameterNames,
     @required this.returnType,
     this.arc = false,
-  });
+  }) : this._parameterNames = parameterNames;
 
-  String generateSource(Library library) {
-    final sb = StringBuffer();
-    final typedefC = "_${name}_C";
-    final typedefDart = "_${name}_Dart";
-    sb.write("\n");
+  @override
+  void generateSource(DartSourceWriter w, Library library) {
+    if (arc) {
+      w.imports.add(
+        const Import('package:cupertino_ffi/objc.dart', prefix: 'ffi'),
+      );
+    }
+    final typedefC = '_${name}_C';
+    final typedefDart = '_${name}_Dart';
+    w.write('\n');
 
     // Lookup
-    sb.write("/// C function '$name'.\n");
-    sb.write("${toDartType(returnType)} $name(");
+    w.write('/// C function `$name`.\n');
+    w.write('${w.getDartType(returnType)} $name(');
     if (parameters.isNotEmpty) {
-      sb.write("\n");
+      w.write('\n');
       for (var parameter in parameters) {
-        sb.write("  ${toDartType(parameter.type)} ${parameter.name},\n");
+        w.write('  ${w.getDartType(parameter.type)} ${parameter.name},\n');
       }
     }
-    sb.write(") {\n");
-    if (arc) {
-      sb.write("  final _result = ");
+    w.write(') {\n');
+    if (w.getDartType(returnType) == 'void') {
+      w.write('_$name(');
+      w.writeAll(parameterNames, ', ');
+      w.write(');\n');
     } else {
-      sb.write("  return ");
-    }
-    sb.write("_$name(");
-    for (var i = 0; i < parameters.length; i++) {
-      if (i > 0) {
-        sb.write(", ");
+      if (arc && returnType.startsWith('*')) {
+        w.write('  final result = ');
+        w.write('_$name(');
+        w.writeAll(parameterNames, ', ');
+        w.write(');\n');
+        w.write('  arcAdd(result);\n');
+        w.write('  return result;\n');
+      } else {
+        w.write('  return ');
+        w.write('_$name(');
+        w.writeAll(parameterNames, ', ');
+        w.write(');\n');
       }
-      sb.write(parameters[i].name);
     }
-    sb.write(");\n");
-    if (arc) {
-      sb.write("  arcAdd(_result);\n");
-      sb.write("  return _result;\n");
-    }
-    sb.write("}\n");
-    sb.write("final $typedefDart _$name = ");
-    sb.write(
-        "${library.dynamicLibraryIdentifier}.lookupFunction<$typedefC, $typedefDart>(\n");
-    sb.write("  \"$name\",\n");
-    sb.write(");\n");
+    w.write('}\n');
+    w.write('final $typedefDart _$name = ');
+    w.write(
+        '${library.dynamicLibraryIdentifier}.lookupFunction<$typedefC, $typedefDart>(\n');
+    w.write('  \'$name\',\n');
+    w.write(');\n');
 
     // C type
     {
-      sb.write("typedef ${toCType(returnType)} $typedefC(");
+      w.write('typedef ${w.getCType(returnType)} $typedefC(');
       if (parameters.isNotEmpty) {
-        sb.write("\n");
+        w.write('\n');
         for (var parameter in parameters) {
-          sb.write("  ${toCType(parameter.type)} ${parameter.name},\n");
+          w.write('  ${w.getCType(parameter.type)} ${parameter.name},\n');
         }
       }
-      sb.write(");\n");
+      w.write(');\n');
     }
 
     // Dart type
     {
-      sb.write("typedef ${toDartType(returnType)} $typedefDart(");
+      w.write('typedef ${w.getDartType(returnType)} $typedefDart(');
       if (parameters.isNotEmpty) {
-        sb.write("\n");
+        w.write('\n');
         for (var parameter in parameters) {
-          sb.write("  ${toDartType(parameter.type)} ${parameter.name},\n");
+          w.write('  ${w.getDartType(parameter.type)} ${parameter.name},\n');
         }
       }
-      sb.write(");\n");
+      w.write(');\n');
     }
-    return sb.toString();
   }
 }
 

@@ -1,77 +1,139 @@
-import 'package:ffi_tool/c.dart';
+// Copyright (c) 2019 ffi_tool authors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+// OR OTHER DEALINGS IN THE SOFTWARE.
 
-/// Dart Struct Ffi
+import 'package:ffi_tool/c.dart';
+import 'package:meta/meta.dart';
+
+/// A definition for a C struct.
 ///
 /// ```dart
 /// import 'package:ffi_tool/c.dart';
 /// import 'dart:io';
+///
 /// void main() {
 ///   generateFile(File("generated.dart"), library);
 /// }
-/// final library = Library(
-///   dynamicLibraryIdentifier: "dlForExampleLibrary",
+///
+/// const library = Library(
 ///   dynamicLibraryPath: "path/to/library",
-///   importedUris: [
-///     "package:ffi/ffi.dart",
-///   ],
+///
 ///   elements: [
-///     // A Struct
 ///     Struct(
 ///       name: "Coordinate",
-///       members: <Member>[Member(type:"double",name : "latitude"), Member(type:"double",name : "longitude" )],
+///       fields: <Field>[
+///         Field(
+///           type: 'double',
+///           name: 'latitude',
+///         ),
+///         Field(
+///           type: 'double',
+///           name: 'longitude',
+///         ),
+///       ],
 ///     ),
 ///   ],
 /// );
 /// ```
 class Struct extends Element {
   final String name;
-  final List<Member> members;
+  final bool arc;
+  final List<Field> fields;
 
-  Struct({this.name, this.members});
+  /// Optional comment.
+  final String comment;
+
+  /// Optional source injected inside the generated class.
+  final String inject;
+
+  const Struct({
+    @required this.name,
+    this.arc = false,
+    @required this.fields,
+    this.comment,
+    this.inject,
+  });
 
   @override
-  String generateSource(Library library) {
-    final sb = StringBuffer();
+  void generateSource(DartSourceWriter w, Library library) {
+    // 'allocate' requires this package
+    w.imports.add(
+      const Import('package:ffi/ffi.dart', prefix: 'ffi'),
+    );
+    if (arc) {
+      w.imports.add(
+        const Import('package:cupertino_ffi/ffi.dart', prefix: 'ffi'),
+      );
+    }
 
-    sb.write('\nclass $name extends Struct {');
-    sb.writeAll(members.map((member) => member.toString()), '\n');
+    w.write('\n');
+    if (comment == null) {
+      w.write('/// C struct `$name`.\n');
+    } else {
+      w.write('/// ');
+      w.writeAll(comment.split('\n'), '\n/// ');
+      w.write('\n');
+    }
+    w.write('class $name extends ffi.Struct {\n');
+    w.write('  \n');
 
-    final allocatedParameters = StringBuffer()
-      ..writeAll(members.map((member) => member.getAllocatedParam()), ', ');
+    //
+    // Write fields
+    //
+    for (var field in fields) {
+      // Some types (Int32, Float32, etc.) need to be annotated
+      final annotationName = w.getPropertyAnnotationType(field.type);
+      if (annotationName != null) {
+        w.write('  @$annotationName()\n');
+      }
+      w.write('  ${w.getDartType(field.type)} ${field.name};\n');
+      w.write('  \n');
+    }
 
-    final allocatedRefs = StringBuffer()
-      ..writeAll(members.map((member) => member.getAllocatedRef()), '\n');
+    //
+    // Write factory
+    //
+    w.write('  static ffi.Pointer<$name> allocate() {\n');
+    if (arc) {
+      w.write('    final result = ffi.allocate<$name>();\n');
+      w.write('    ffi.arcAdd(result);\n');
+      w.write('    return result;\n');
+    } else {
+      w.write('    return ffi.allocate<$name>();\n');
+    }
+    w.write('  }\n');
+    w.write('  \n');
 
-    sb.write(
-        '\n\n  factory $name.allocate(${allocatedParameters.toString()}) =>');
-    sb.write('\n      allocate<$name>().ref\n');
-    sb.write('${allocatedRefs.toString()}');
-    sb.write(';\n');
-    sb.write('}\n');
-    return sb.toString();
+    //
+    // Write injected source
+    //
+    final inject = this.inject;
+    if (inject != null) {
+      w.write(inject);
+    }
+
+    w.write('}\n');
   }
 }
 
-class Member {
+class Field {
   final String name;
   final String type;
-  Member({this.type, this.name});
-  String getAllocatedParam() => '$type $name';
-  String getAllocatedRef() =>
-      (StringBuffer()..write('        ..$name = $name')).toString();
-
-  @override
-  String toString() =>
-      (StringBuffer()..write('\n  @${getAnnotation(type)}()\n  ${type} $name;'))
-          .toString();
-
-  String getAnnotation(String type) {
-    switch (type) {
-      case 'double':
-        return 'Double';
-        break;
-      default:
-        'double';
-    }
-  }
+  const Field({this.type, this.name});
 }

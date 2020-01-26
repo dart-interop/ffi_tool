@@ -18,6 +18,7 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
+/// Generates 'dart:ffi' bindings for C libraries.
 library ffi_tool.c;
 
 export 'src/c/generate_file.dart';
@@ -25,3 +26,4 @@ export 'src/c/library.dart';
 export 'src/c/func.dart';
 export 'src/c/struct.dart';
 export 'src/c/global.dart';
+export 'src/c/dart_source_writer.dart';

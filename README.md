@@ -1,18 +1,23 @@
 # Overview
-<a href="https://github.com/terrier989/zone_local">
- <img alt="GitHub Actions status" src="https://github.com/terrier989/zone_local/workflows/Dart%20CI/badge.svg">
+<a href='https://github.com/dart-interop/ffi_tool'>
+ <img alt='GitHub Actions status' src='https://github.com/dart-interop/ffi_tool/workflows/Dart%20CI/badge.svg'>
 </a>
 
 This library helps developers to generate [dart:ffi](https://dart.dev/guides/libraries/c-interop)
 bindings. You can contribute at [github.com/dart-interop/ffi_tool](https://github.com/dart-interop/ffi_tool).
 
-The advantages of using this package (instead of writing hand-written code) are:
-  * Often less boilerplate
-  * Often more readable (e.g. "*void" instead of "Pointer<Void>")
-  * Support for Apple's ARC
+The advantages over handwritten _dart:ffi_ code are:
+  * __Less boilerplate__
+    * You don't have to define multiple types for each C function.
+    * You can require the generated code to use [cupertino_ffi](https://pub.dev/packages/cupertino_ffi)
+      reference counting methods (`arcPush`, `arcPop`, `arcReturn`).
+  * __Possibly better readability__
+    * You can use the original identifiers (such as `*size_t` instead of `Pointer<IntPtr>`).
+    * You can define aliases, e.g. `const len_t = 'int32';`.
 
 # Getting started
-In "pubspec.yaml", add:
+## 1.Add dependency
+In 'pubspec.yaml':
 ```yaml
 dev_dependencies:
   ffi_tool: ^0.1.0
@@ -20,41 +25,65 @@ dev_dependencies:
 
 Run `pub get`.
 
-You have to write a generator script (see examples below) in some file. For example,
-"tool/generate_example.dart".
+## 2.Write a script
+Create 'tool/generate_example.dart'.
 
-Run the script with `pub run tool/generate_example.dart`.
-
-# Generator scripts
-## C library
+### Example
 
 ```dart
 import 'package:ffi_tool/c.dart';
 import 'dart:io';
 
 void main() {
-  generateFile(File("lib/src/generated.dart"), library);
+  // Generates source code and runs 'dartfmt'
+  generateFile(File('lib/src/generated.dart'), library);
 }
 
-final library = Library(
-  dynamicLibraryIdentifier: "dlForExampleLibrary",
-  dynamicLibraryPath: "path/to/library",
-  importedUris: [
-    "package:ffi/ffi.dart",
-  ],
+final library = const Library(
+  // Where the library is found?
+  dynamicLibraryPath: 'path/to/library',
+
+  // Optional imports
+  importedUris: {
+    'package:example/library.dart',
+  },
+
+  /// List of generated functions, structs, and global variables
   elements: <Element>[
-    // C function
+    // A definition for a function in C
     Func(
-      name: "Example",
-      parameterTypes: ["int32", "float64", "*void"],
-      returnType: "void",
+      name: 'Example',
+      parameterTypes: ['int32', 'float32', '*void'],
+      returnType: 'void',
     ),
 
-    // C global variable
+    // A definition for a struct in C
+    Struct(
+      name: 'ExampleStruct',
+      fields: [
+        Field(
+          name: 'length',
+          type: 'size_t',
+        ),
+      ],
+    ),
+
+    // A definition for a global variable in C
     Global(
-      name: "ExampleGlobal",
-      type: "Int32",
+      name: 'ExampleGlobal',
+      type: 'Int32',
     ),
   ],
 );
+```
+
+## 3.Run the script
+With Dart SDK:
+```
+pub run tool/generate_example.dart
+```
+
+With Flutter SDK:
+```
+flutter pub run tool/generate_example.dart
 ```

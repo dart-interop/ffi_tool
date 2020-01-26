@@ -1,7 +1,7 @@
 // Copyright (c) 2019 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
+// of this software and associated documentation files (the 'Software'), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
@@ -10,7 +10,7 @@
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 // IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
@@ -21,44 +21,43 @@
 import 'package:ffi_tool/c.dart';
 import 'package:meta/meta.dart';
 
+/// A definition for a C library.
 class Library {
-  final List<String> importedUris;
+  final Iterable<Import> importedUris;
   final String dynamicLibraryIdentifier;
   final String dynamicLibraryPath;
   final List<Element> elements;
 
-  Library({
-    @required this.importedUris,
-    @required this.dynamicLibraryIdentifier,
+  const Library({
     @required this.dynamicLibraryPath,
     @required this.elements,
+    this.importedUris = const {},
+    this.dynamicLibraryIdentifier = '_dynamicLibrary',
   });
 
-  String generateSource() {
-    final sb = StringBuffer();
-    sb.write("// AUTOMATICALLY GENERATED. DO NOT EDIT.\n");
-    final imports = ({"dart:ffi"}..addAll(importedUris)).toList()..sort();
-    if (elements.any((e) => e is Func && e.arc)) {
-      imports.add("package:cupertino_ffi/objc.dart");
-    }
-    for (var uri in imports) {
-      sb.write("import '$uri';\n");
-    }
-    sb.write("\n");
-    sb.write("/// Dynamic library\n");
-    sb.write(
-        "final DynamicLibrary ${dynamicLibraryIdentifier} = DynamicLibrary.open(\n");
-    sb.write("  \"${dynamicLibraryPath}\",\n");
-    sb.write(");\n");
+  void generateSource(DartSourceWriter w) {
+    w.imports.add(const Import('dart:ffi', prefix: 'ffi'));
+    w.imports.addAll(importedUris);
+    w.write('/// Dynamic library\n');
+    w.write(
+        'final ffi.DynamicLibrary ${dynamicLibraryIdentifier} = ffi.DynamicLibrary.open(\n');
+    w.write('  \'${dynamicLibraryPath}\',\n');
+    w.write(');\n');
     for (var element in elements) {
-      sb.write(element.generateSource(this));
+      element.generateSource(w, this);
     }
-    return sb.toString();
+  }
+
+  @override
+  String toString() {
+    final w = DartSourceWriter();
+    generateSource(w);
+    return w.toString();
   }
 }
 
 abstract class Element {
   const Element();
 
-  String generateSource(Library library);
+  void generateSource(DartSourceWriter w, Library library);
 }
