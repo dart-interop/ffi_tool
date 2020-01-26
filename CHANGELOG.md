@@ -1,3 +1,6 @@
+# 0.2.2
+  * Bug fixes
+
 # 0.2.1
   * Bug fixes
   * Support for generating 'library', 'part of', and 'parts' directives.

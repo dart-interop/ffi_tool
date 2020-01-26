@@ -1,5 +1,6 @@
 import 'package:ffi_tool/c.dart';
 import 'package:test/test.dart';
+import 'dart:io';
 
 void main() {
   test('Library defaults', () {
@@ -26,6 +27,16 @@ void main() {
         ),
       ],
     );
+
+    // Generate file so we can see linter warnings
+    final file = File('test/generated/example_1.dart');
+    generateFile(file, library);
+
+    // Test that we generated something.
+    // We don't test the file content we don't have linter version fixed for
+    // every developer.
+    expect(file.readAsStringSync(), hasLength(greaterThan(100)));
+
     expect(library.toString(), '''
 // AUTOMATICALLY GENERATED. DO NOT EDIT.
 
@@ -49,13 +60,13 @@ ffi.Pointer<ffi.Utf8> Example(
 final _Example_Dart _Example = dynamicLibraryForExampleLibrary.lookupFunction<_Example_C, _Example_Dart>(
   'Example',
 );
-typedef ffi.Pointer<ffi.Utf8> _Example_C(
+typedef _Example_C = ffi.Pointer<ffi.Utf8> Function(
   ffi.Int32 arg0,
   ffi.Float arg1,
   ffi.Pointer arg2,
   ffi.Void arg3,
 );
-typedef ffi.Pointer<ffi.Utf8> _Example_Dart(
+typedef _Example_Dart = ffi.Pointer<ffi.Utf8> Function(
   int arg0,
   double arg1,
   ffi.Pointer arg2,
@@ -175,8 +186,8 @@ ffi.Pointer Example() {
 final _Example_Dart _Example = _dynamicLibrary.lookupFunction<_Example_C, _Example_Dart>(
   'Example',
 );
-typedef ffi.Pointer _Example_C();
-typedef ffi.Pointer _Example_Dart();
+typedef _Example_C = ffi.Pointer Function();
+typedef _Example_Dart = ffi.Pointer Function();
 ''');
   });
 }

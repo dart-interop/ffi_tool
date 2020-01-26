@@ -63,7 +63,7 @@ class Func extends Element {
     List<String> parameterNames,
     @required this.returnType,
     this.arc = false,
-  }) : this._parameterNames = parameterNames;
+  }) : _parameterNames = parameterNames;
 
   @override
   void generateSource(DartSourceWriter w, Library library) {
@@ -114,7 +114,7 @@ class Func extends Element {
 
     // C type
     {
-      w.write('typedef ${w.getCType(returnType)} $typedefC(');
+      w.write('typedef $typedefC = ${w.getCType(returnType)} Function(');
       if (parameters.isNotEmpty) {
         w.write('\n');
         for (var parameter in parameters) {
@@ -126,7 +126,7 @@ class Func extends Element {
 
     // Dart type
     {
-      w.write('typedef ${w.getDartType(returnType)} $typedefDart(');
+      w.write('typedef $typedefDart = ${w.getDartType(returnType)} Function(');
       if (parameters.isNotEmpty) {
         w.write('\n');
         for (var parameter in parameters) {
