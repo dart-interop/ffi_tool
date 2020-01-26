@@ -74,11 +74,11 @@ class Struct extends Element {
   void generateSource(DartSourceWriter w, Library library) {
     // 'allocate' requires this package
     w.imports.add(
-      const Import('package:ffi/ffi.dart', prefix: 'ffi'),
+      const ImportedUri('package:ffi/ffi.dart', prefix: 'ffi'),
     );
     if (arc) {
       w.imports.add(
-        const Import('package:cupertino_ffi/ffi.dart', prefix: 'ffi'),
+        const ImportedUri('package:cupertino_ffi/ffi.dart', prefix: 'ffi'),
       );
     }
 

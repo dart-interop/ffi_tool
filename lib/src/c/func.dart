@@ -69,7 +69,7 @@ class Func extends Element {
   void generateSource(DartSourceWriter w, Library library) {
     if (arc) {
       w.imports.add(
-        const Import('package:cupertino_ffi/objc.dart', prefix: 'ffi'),
+        const ImportedUri('package:cupertino_ffi/objc.dart', prefix: 'ffi'),
       );
     }
     final typedefC = '_${name}_C';

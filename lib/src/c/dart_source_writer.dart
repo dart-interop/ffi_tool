@@ -26,14 +26,14 @@ const _types = <String, _Type>{
   'void': _Type(ffi: 'ffi.Void', dart: 'void'),
 
   '*utf8': _Type(
-    ffi: 'ffi.Pointer<Utf8>',
-    dart: 'ffi.Pointer<Utf8>',
-    importInfo: Import('package:ffi/ffi.dart', prefix: 'ffi'),
+    ffi: 'ffi.Pointer<ffi.Utf8>',
+    dart: 'ffi.Pointer<ffi.Utf8>',
+    importInfo: ImportedUri('package:ffi/ffi.dart', prefix: 'ffi'),
   ),
   '*utf16': _Type(
-    ffi: 'ffi.Pointer<Utf16>',
-    dart: 'ffi.Pointer<Utf16>',
-    importInfo: Import('package:ffi/ffi.dart', prefix: 'ffi'),
+    ffi: 'ffi.Pointer<ffi.Utf16>',
+    dart: 'ffi.Pointer<ffi.Utf16>',
+    importInfo: ImportedUri('package:ffi/ffi.dart', prefix: 'ffi'),
   ),
 
   'intptr': _Type(ffi: 'ffi.IntPtr', dart: 'int'),
@@ -57,7 +57,10 @@ const _types = <String, _Type>{
 };
 
 class DartSourceWriter {
-  final Set<Import> imports = {};
+  String libraryName;
+  String partOf;
+  final Set<ImportedUri> imports = {};
+  final Set<String> parts = {};
   final StringBuffer _sb = StringBuffer();
 
   /// Returns Dart C type for the description type.
@@ -80,7 +83,7 @@ class DartSourceWriter {
       return type.ffi;
     }
     if (name.startsWith('*')) {
-      return 'Pointer<${getCType(name.substring(1))}>';
+      return 'ffi.Pointer<${getCType(name.substring(1))}>';
     }
     return name;
   }
@@ -104,7 +107,7 @@ class DartSourceWriter {
       return type.dart;
     }
     if (name.startsWith('*')) {
-      return 'Pointer<${getCType(name.substring(1))}>';
+      return 'ffi.Pointer<${getCType(name.substring(1))}>';
     }
     return name;
   }
@@ -118,7 +121,7 @@ class DartSourceWriter {
   ///   * 'void' --> 'Void'
   String getPropertyAnnotationType(String name) {
     if (name.startsWith('*')) {
-      return 'Pointer';
+      return 'ffi.Pointer';
     }
     final type = _types[name.toLowerCase()];
     if (type != null) {
@@ -131,15 +134,40 @@ class DartSourceWriter {
   String toString() {
     final sb = StringBuffer();
     sb.write('// AUTOMATICALLY GENERATED. DO NOT EDIT.\n');
-    sb.write('\n');
-    for (var importInfo in imports.toList()..sort()) {
-      sb.write("import '${importInfo.uri}'");
-      final prefix = importInfo.prefix;
-      if (prefix != null) {
-        sb.write(' as $prefix');
-      }
-      sb.write(';\n');
+
+    // Library name
+    if (libraryName != null) {
+      sb.write('\n');
+      sb.write('library $libraryName;\n');
     }
+
+    // Part of
+    if (partOf != null) {
+      sb.write('\n');
+      sb.write('partOf $partOf;\n');
+    }
+
+    // Imports
+    if (imports.isNotEmpty) {
+      sb.write('\n');
+      for (var importInfo in imports.toList()..sort()) {
+        sb.write("import '${importInfo.uri}'");
+        final prefix = importInfo.prefix;
+        if (prefix != null) {
+          sb.write(' as $prefix');
+        }
+        sb.write(';\n');
+      }
+    }
+
+    // Parts
+    if (parts.isNotEmpty) {
+      for (var part in parts) {
+        sb.write("part '$part';\n");
+      }
+    }
+
+    // Content
     sb.write('\n');
     sb.write(_sb.toString());
     return sb.toString();
@@ -154,14 +182,22 @@ class DartSourceWriter {
   }
 }
 
-class Import implements Comparable<Import> {
+/// Describes an imported Dart package.
+class ImportedUri implements Comparable<ImportedUri> {
   final String uri;
   final String prefix;
 
-  const Import(this.uri, {this.prefix});
+  const ImportedUri(this.uri, {this.prefix});
 
   @override
-  int compareTo(Import other) {
+  int get hashCode => uri.hashCode;
+
+  @override
+  bool operator ==(other) =>
+      other is ImportedUri && uri == other.uri && prefix == other.prefix;
+
+  @override
+  int compareTo(ImportedUri other) {
     {
       final r = uri.compareTo(other.uri);
       if (r != 0) {
@@ -175,6 +211,6 @@ class Import implements Comparable<Import> {
 class _Type {
   final String ffi;
   final String dart;
-  final Import importInfo;
+  final ImportedUri importInfo;
   const _Type({@required this.ffi, @required this.dart, this.importInfo});
 }

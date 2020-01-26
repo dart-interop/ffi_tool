@@ -8,19 +8,21 @@ void main() {
       elements: [],
     );
     expect(library.dynamicLibraryIdentifier, '_dynamicLibrary');
-    expect(library.importedUris, <String>{});
+    expect(library.libraryName, isNull);
+    expect(library.partOf, isNull);
+    expect(library.importedUris, <ImportedUri>{});
+    expect(library.parts, <String>{});
   });
 
   test('Functions', () {
     final library = Library(
       dynamicLibraryIdentifier: 'dynamicLibraryForExampleLibrary',
       dynamicLibraryPath: 'path/to/library',
-      importedUris: [],
       elements: [
         Func(
           name: 'Example',
           parameterTypes: ['Int32', 'Float32', '*void', 'void'],
-          returnType: 'ReturnType',
+          returnType: '*utf8',
         ),
       ],
     );
@@ -28,6 +30,7 @@ void main() {
 // AUTOMATICALLY GENERATED. DO NOT EDIT.
 
 import 'dart:ffi' as ffi;
+import 'package:ffi/ffi.dart' as ffi;
 
 /// Dynamic library
 final ffi.DynamicLibrary dynamicLibraryForExampleLibrary = ffi.DynamicLibrary.open(
@@ -35,7 +38,7 @@ final ffi.DynamicLibrary dynamicLibraryForExampleLibrary = ffi.DynamicLibrary.op
 );
 
 /// C function `Example`.
-ReturnType Example(
+ffi.Pointer<ffi.Utf8> Example(
   int arg0,
   double arg1,
   ffi.Pointer arg2,
@@ -46,13 +49,13 @@ ReturnType Example(
 final _Example_Dart _Example = dynamicLibraryForExampleLibrary.lookupFunction<_Example_C, _Example_Dart>(
   'Example',
 );
-typedef ReturnType _Example_C(
+typedef ffi.Pointer<ffi.Utf8> _Example_C(
   ffi.Int32 arg0,
   ffi.Float arg1,
   ffi.Pointer arg2,
   ffi.Void arg3,
 );
-typedef ReturnType _Example_Dart(
+typedef ffi.Pointer<ffi.Utf8> _Example_Dart(
   int arg0,
   double arg1,
   ffi.Pointer arg2,
@@ -64,7 +67,7 @@ typedef ReturnType _Example_Dart(
   test('Globals', () {
     final library = Library(
       dynamicLibraryPath: 'path/to/library',
-      importedUris: [],
+      importedUris: {},
       elements: [
         Global(
           name: 'Global0',
@@ -102,7 +105,6 @@ final Global1Type Global1 = _dynamicLibrary.lookup<Global1Type>(
     final library = Library(
       dynamicLibraryIdentifier: 'dynamicLibraryForExampleLibrary',
       dynamicLibraryPath: 'path/to/library',
-      importedUris: [],
       elements: [
         Struct(
           name: 'Coordinate',
@@ -144,7 +146,6 @@ class Coordinate extends ffi.Struct {
   test('ARC', () {
     final library = Library(
       dynamicLibraryPath: 'path/to/library',
-      importedUris: [],
       elements: [
         Func(
           name: 'Example',

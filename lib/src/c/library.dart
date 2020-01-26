@@ -23,21 +23,53 @@ import 'package:meta/meta.dart';
 
 /// A definition for a C library.
 class Library {
-  final Iterable<Import> importedUris;
   final String dynamicLibraryIdentifier;
   final String dynamicLibraryPath;
+
+  /// Optional 'library' directive in the generated file.
+  final String libraryName;
+
+  /// Optional 'part of' directive in the generated file.
+  final String partOf;
+
+  /// Optional imported URIs.
+  final Set<ImportedUri> importedUris;
+
+  /// Optional 'part' directives in the generated file.
+  final Set<String> parts;
+
+  /// Elements.
   final List<Element> elements;
 
   const Library({
     @required this.dynamicLibraryPath,
     @required this.elements,
+    this.libraryName,
+    this.partOf,
     this.importedUris = const {},
+    this.parts = const {},
     this.dynamicLibraryIdentifier = '_dynamicLibrary',
   });
 
   void generateSource(DartSourceWriter w) {
-    w.imports.add(const Import('dart:ffi', prefix: 'ffi'));
+    w.libraryName = libraryName;
+    w.partOf = partOf;
+
+    // Imports
+    w.imports.add(const ImportedUri('dart:ffi', prefix: 'ffi'));
     w.imports.addAll(importedUris);
+
+    // Parts
+    w.parts.addAll(parts);
+
+    // Parts
+    if (parts.isNotEmpty) {
+      w.write('\n');
+      for (var part in parts) {
+        w.write("part '$part';\n");
+      }
+      w.write('\n');
+    }
     w.write('/// Dynamic library\n');
     w.write(
         'final ffi.DynamicLibrary ${dynamicLibraryIdentifier} = ffi.DynamicLibrary.open(\n');

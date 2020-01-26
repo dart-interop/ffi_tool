@@ -1,3 +1,7 @@
+# 0.2.1
+  * Bug fixes
+  * Support for generating 'library', 'part of', and 'parts' directives.
+
 # 0.2.0
   * Support for pedantic 1.9 linter warning.
   * Added struct support.
