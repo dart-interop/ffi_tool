@@ -1,7 +1,7 @@
 # Overview
-<a href='https://github.com/dart-interop/ffi_tool'>
- <img alt='GitHub Actions status' src='https://github.com/dart-interop/ffi_tool/workflows/Dart%20CI/badge.svg'>
-</a>
+[![Pub Package](https://img.shields.io/pub/v/ffi_tool.svg)](https://pub.dartlang.org/packages/ffi_tool)
+[![Github Actions CI](https://github.com/dart-interop/ffi_tool/workflows/Dart%20CI/badge.svg)](https://github.com/dart-interop/ffi_tool/actions?query=workflow%3A%22Dart+CI%22)
+[![Build Status](https://travis-ci.org/dart-interop/ffi_tool.svg?branch=master)](https://travis-ci.org/dart-interop/ffi_tool)
 
 This library helps developers to generate [dart:ffi](https://dart.dev/guides/libraries/c-interop)
 bindings. You can contribute at [github.com/dart-interop/ffi_tool](https://github.com/dart-interop/ffi_tool).
