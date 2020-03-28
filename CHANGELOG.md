@@ -1,3 +1,6 @@
+# 0.2.3
+  * Adds support for disabling dartfmt.
+
 # 0.2.2
   * Bug fixes
 
