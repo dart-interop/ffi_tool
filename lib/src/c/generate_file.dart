@@ -22,13 +22,13 @@ import 'package:ffi_tool/c.dart';
 import 'library.dart';
 import 'dart:io';
 
-/// Generates [file] by generating C bindings for [library] and running
-/// 'dartfmt -w $PATH'.
-void generateFile(File file, Library library) {
+/// Generates [file] by generating C bindings for [library].
+/// If format is true 'dartfmt -w $PATH' will be run to format the generated file.
+void generateFile(File file, Library library, {bool format = true}) {
   final w = DartSourceWriter();
   library.generateSource(w);
   file.writeAsStringSync(w.toString());
-  _dartFmt(file.path);
+  if (format) _dartFmt(file.path);
 }
 
 /// Formats a file with 'dartfmt'
