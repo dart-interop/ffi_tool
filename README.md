@@ -39,7 +39,7 @@ void main() {
   generateFile(File('lib/src/generated.dart'), library);
 }
 
-final library = const Library(
+final library = Library(
   // Where the library is found?
   dynamicLibraryPath: DynamicLibraryConfig(
       windows: DynamicLibraryPlatformConfig(
