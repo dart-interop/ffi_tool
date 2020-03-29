@@ -6,15 +6,7 @@ void main() {
 }
 
 final library = Library(
-  dynamicLibraryPath: DynamicLibraryConfig(
-      windows: DynamicLibraryPlatformConfig(
-          creationMode: DynamicLibraryCreationMode.open,
-          path: 'path/to/library.dll'),
-      android: DynamicLibraryPlatformConfig(
-          creationMode: DynamicLibraryCreationMode.open,
-          path: 'path/to/library.so'),
-      iOS: DynamicLibraryPlatformConfig(
-          creationMode: DynamicLibraryCreationMode.process)),
+  dynamicLibraryPath: 'path/to/library',
   elements: [
     // A function
     Func(
