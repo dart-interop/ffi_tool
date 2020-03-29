@@ -22,7 +22,7 @@ In _pubspec.yaml_:
 
 ```yaml
 dev_dependencies:
-  ffi_tool: ^0.2.4
+  ffi_tool: ^0.2.3
 ```
 
 Run `pub get`.
