@@ -26,4 +26,5 @@ export 'src/c/library.dart';
 export 'src/c/func.dart';
 export 'src/c/struct.dart';
 export 'src/c/global.dart';
+export 'src/c/config.dart';
 export 'src/c/dart_source_writer.dart';
