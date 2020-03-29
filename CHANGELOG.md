@@ -1,3 +1,6 @@
+# 0.2.4
+  * Adds support for platform-specific library loading.
+
 # 0.2.3
   * Adds support for disabling dartfmt.
 
