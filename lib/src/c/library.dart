@@ -17,14 +17,13 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
-
 import 'package:ffi_tool/c.dart';
 import 'package:meta/meta.dart';
 
 /// A definition for a C library.
 class Library {
   final String dynamicLibraryIdentifier;
-  final String dynamicLibraryPath;
+  final DynamicLibraryConfig dynamicLibraryPath;
 
   /// Optional 'library' directive in the generated file.
   final String libraryName;
@@ -57,6 +56,7 @@ class Library {
 
     // Imports
     w.imports.add(const ImportedUri('dart:ffi', prefix: 'ffi'));
+    w.imports.add(const ImportedUri('dart:io', prefix: 'io', show: 'Platform'));
     w.imports.addAll(importedUris);
 
     // Parts
@@ -71,10 +71,39 @@ class Library {
       w.write('\n');
     }
     w.write('/// Dynamic library\n');
-    w.write(
-        'final ffi.DynamicLibrary ${dynamicLibraryIdentifier} = ffi.DynamicLibrary.open(\n');
-    w.write('  \'${dynamicLibraryPath}\',\n');
-    w.write(');\n');
+    w.write('final ffi.DynamicLibrary ${dynamicLibraryIdentifier} = _open();');
+    w.write('\n');
+    w.write('ffi.DynamicLibrary _open(){\n\t');
+    if (dynamicLibraryPath.windows != null) {
+      w.write(
+          'if(io.Platform.isWindows) return ffi.${dynamicLibraryPath.windows};\n\t');
+    }
+    if (dynamicLibraryPath.linux != null) {
+      w.write(
+          'if(io.Platform.isLinux) return ffi.${dynamicLibraryPath.linux};\n\t');
+    }
+    if (dynamicLibraryPath.android != null) {
+      w.write(
+          'if(io.Platform.isAndroid) return ffi.${dynamicLibraryPath.android};\n\t');
+    }
+    if (dynamicLibraryPath.macOS != null) {
+      w.write(
+          'if(io.Platform.isMacOS) return ffi.${dynamicLibraryPath.macOS};\n\t');
+    }
+    if (dynamicLibraryPath.iOS != null) {
+      w.write(
+          'if(io.Platform.isIOS) return ffi.${dynamicLibraryPath.iOS};\n\t');
+    }
+    if (dynamicLibraryPath.fuchsia != null) {
+      w.write(
+          'if(io.Platform.isFuchsia) return ffi.${dynamicLibraryPath.fuchsia};\n\t');
+    }
+    var other = dynamicLibraryPath.other == null
+        ? 'throw UnsupportedError(\'This platform is not supported.\');\n'
+        : 'return ffi.${dynamicLibraryPath.other};\n';
+    w.write(other);
+    w.write('}');
+
     for (var element in elements) {
       element.generateSource(w, this);
     }
