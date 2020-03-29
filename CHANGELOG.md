@@ -1,3 +1,7 @@
+# 0.2.5
+  * Fixes issues caused by a breaking change after a pull request didn't go through enough code
+    review.
+
 # 0.2.3
   * Adds support for disabling dartfmt.
 
