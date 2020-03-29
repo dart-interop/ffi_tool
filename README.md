@@ -41,7 +41,15 @@ void main() {
 
 final library = const Library(
   // Where the library is found?
-  dynamicLibraryPath: 'path/to/library',
+  dynamicLibraryPath: DynamicLibraryConfig(
+      windows: DynamicLibraryPlatformConfig(
+          creationMode: DynamicLibraryCreationMode.open,
+          path: 'path/to/library.dll'),
+      android: DynamicLibraryPlatformConfig(
+          creationMode: DynamicLibraryCreationMode.open,
+          path: 'path/to/library.so'),
+      iOS: DynamicLibraryPlatformConfig(
+          creationMode: DynamicLibraryCreationMode.process)),
 
   // Optional imports
   importedUris: {
