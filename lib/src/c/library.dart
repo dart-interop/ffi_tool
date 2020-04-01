@@ -91,7 +91,7 @@ class Library {
 
   bool get _platformAware => dynamicLibraryConfig != null;
 
-  bool get _customLoadCode => _customLoadCode != null;
+  bool get _customLoadCode => customLoadCode != null;
 
   void generateSource(DartSourceWriter w) {
     w.libraryName = libraryName;
