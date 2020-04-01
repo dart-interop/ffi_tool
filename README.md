@@ -39,17 +39,12 @@ void main() {
   generateFile(File('lib/src/generated.dart'), library);
 }
 
-final library = Library(
-  // Where the library is found?
-  dynamicLibraryPath: DynamicLibraryConfig(
-      windows: DynamicLibraryPlatformConfig(
-          creationMode: DynamicLibraryCreationMode.open,
-          path: 'path/to/library.dll'),
-      android: DynamicLibraryPlatformConfig(
-          creationMode: DynamicLibraryCreationMode.open,
-          path: 'path/to/library.so'),
-      iOS: DynamicLibraryPlatformConfig(
-          creationMode: DynamicLibraryCreationMode.process)),
+final library = const Library.platformAware(
+  // Configure, how the dynamic library should be loaded depending on the platform
+  dynamicLibraryConfig: DynamicLibraryConfig(
+      windows: DynamicLibraryPlatformConfig.open('path/to/library.dll'),
+      android: DynamicLibraryPlatformConfig.open('path/to/library.so'),
+      iOS: DynamicLibraryPlatformConfig.process()),
 
   // Optional imports
   importedUris: {

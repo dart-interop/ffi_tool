@@ -1,42 +1,56 @@
-import 'package:meta/meta.dart';
+// Copyright (c) 2020 ffi_tool authors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the 'Software'), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+// OR OTHER DEALINGS IN THE SOFTWARE.
+
 
 ///Represents the different methods to create a `DynamicLibrary`.
-///
-///See the `DynamicLibrary` class for more information.
-enum DynamicLibraryCreationMode { executable, open, process }
+enum _DynamicLibraryCreationMode { executable, open, process }
 
 ///Configures how a `DynamicLibrary` should be created on a platform.
-///
-///If the library is dynamic and opend, a path to it must be provided.
-///For static creation modes, the path parameter must remaind `null`.
-///See the `DynamicLibrary` class for more information.
+///The different constructors represents the different constructors of `DynamicLibrary`.
+///See `DynamicLibrary` for more information.
 class DynamicLibraryPlatformConfig {
-  final DynamicLibraryCreationMode creationMode;
-  final String path;
+  final _DynamicLibraryCreationMode _creationMode;
+  final String _path;
 
-  const DynamicLibraryPlatformConfig({@required this.creationMode, this.path})
-      : assert(creationMode != null, 'creationMode must not be null!'),
-        assert(
-            creationMode != DynamicLibraryCreationMode.open ||
-                (creationMode == DynamicLibraryCreationMode.open &&
-                    path != null),
-            'When using a dynamic library, a path is required!'),
-        assert(
-            creationMode == DynamicLibraryCreationMode.open ||
-                (creationMode != DynamicLibraryCreationMode.open &&
-                    path == null),
-            'When using a static library, the must not be a path!');
+  const DynamicLibraryPlatformConfig.executable()
+      : _path = null,
+        _creationMode = _DynamicLibraryCreationMode.executable;
+
+  const DynamicLibraryPlatformConfig.process()
+      : _path = null,
+        _creationMode = _DynamicLibraryCreationMode.process;
+
+  const DynamicLibraryPlatformConfig.open(String path)
+      : _path = path,
+        _creationMode = _DynamicLibraryCreationMode.open;
 
   @override
   String toString() {
-    switch (creationMode) {
-      case DynamicLibraryCreationMode.executable:
+    switch (_creationMode) {
+      case _DynamicLibraryCreationMode.executable:
         return 'DynamicLibrary.executable()';
         break;
-      case DynamicLibraryCreationMode.open:
-        return 'DynamicLibrary.open(\'$path\')';
+      case _DynamicLibraryCreationMode.open:
+        return 'DynamicLibrary.open(\'$_path\')';
         break;
-      case DynamicLibraryCreationMode.process:
+      case _DynamicLibraryCreationMode.process:
         return 'DynamicLibrary.process()';
         break;
     }
@@ -44,6 +58,12 @@ class DynamicLibraryPlatformConfig {
   }
 }
 
+/// Defines, how the dynamic library should be loaded on each of darts known platforms.
+///
+/// If the `DynamicLibraryPlatformConfig` is `null` for a platform, this platform will fallback to `other`.
+/// If `other` is `null`, executing on each platform falling back to it 
+/// and on all platforms that do not match any known platform (e.g. windows, linux, ...),
+/// will throw an `UnsupportedError`
 class DynamicLibraryConfig {
   final DynamicLibraryPlatformConfig windows;
   final DynamicLibraryPlatformConfig linux;
@@ -52,12 +72,6 @@ class DynamicLibraryConfig {
   final DynamicLibraryPlatformConfig android;
   final DynamicLibraryPlatformConfig fuchsia;
   final DynamicLibraryPlatformConfig other;
-
-  ///Shortcut for using the same dynamic library on every platform.
-  DynamicLibraryConfig.open(String path)
-      : this(
-            other: DynamicLibraryPlatformConfig(
-                creationMode: DynamicLibraryCreationMode.open, path: path));
 
   const DynamicLibraryConfig(
       {this.windows,
