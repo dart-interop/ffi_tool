@@ -3,32 +3,32 @@
 [![Github Actions CI](https://github.com/dart-interop/ffi_tool/workflows/Dart%20CI/badge.svg)](https://github.com/dart-interop/ffi_tool/actions?query=workflow%3A%22Dart+CI%22)
 [![Build Status](https://travis-ci.org/dart-interop/ffi_tool.svg?branch=master)](https://travis-ci.org/dart-interop/ffi_tool)
 
-This is a simple package for generating [dart:ffi](https://dart.dev/guides/libraries/c-interop) bindings.
-
-You can contribute at [github.com/dart-interop/ffi_tool](https://github.com/dart-interop/ffi_tool).
+This library helps developers to generate [dart:ffi](https://dart.dev/guides/libraries/c-interop)
+bindings. You can contribute at [github.com/dart-interop/ffi_tool](https://github.com/dart-interop/ffi_tool).
 
 The advantages over handwritten _dart:ffi_ code are:
   * __Less boilerplate__
     * You don't have to define multiple types for each C function.
     * You can require the generated code to use [cupertino_ffi](https://pub.dev/packages/cupertino_ffi)
       reference counting methods (`arcPush`, `arcPop`, `arcReturn`).
-  * __Source code readability__
+  * __Possibly better readability__
     * You can use the original identifiers (such as `*size_t` instead of `Pointer<IntPtr>`).
     * You can define aliases, e.g. `const len_t = 'int32';`.
 
 # Getting started
 ## 1.Add dependency
-In _pubspec.yaml_:
-
+In 'pubspec.yaml':
 ```yaml
 dev_dependencies:
-  ffi_tool: ^0.2.5
+  ffi_tool: ^0.1.0
 ```
 
 Run `pub get`.
 
 ## 2.Write a script
-Create _tool/generate_example.dart_:
+Create 'tool/generate_example.dart'.
+
+### Example
 
 ```dart
 import 'package:ffi_tool/c.dart';
@@ -39,9 +39,12 @@ void main() {
   generateFile(File('lib/src/generated.dart'), library);
 }
 
-final library = const Library(
-  // Where the library is found?
-  dynamicLibraryPath: 'path/to/library',
+final library = const Library.platformAware(
+  // Configure, how the dynamic library should be loaded depending on the platform
+  dynamicLibraryConfig: DynamicLibraryConfig(
+      windows: DynamicLibraryPlatformConfig.open('path/to/library.dll'),
+      android: DynamicLibraryPlatformConfig.open('path/to/library.so'),
+      iOS: DynamicLibraryPlatformConfig.process()),
 
   // Optional imports
   importedUris: {
@@ -78,12 +81,12 @@ final library = const Library(
 ```
 
 ## 3.Run the script
-If you use Dart SDK, run:
+With Dart SDK:
 ```
 pub run tool/generate_example.dart
 ```
 
-If you use Flutter SDK, run:
+With Flutter SDK:
 ```
 flutter pub run tool/generate_example.dart
 ```
