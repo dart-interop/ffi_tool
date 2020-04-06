@@ -1,4 +1,4 @@
-// Copyright (c) 2019 ffi_tool authors.
+// Copyright (c) 2020 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the 'Software'), to deal
@@ -18,14 +18,13 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-import 'package:ffi_tool/c.dart';
 import 'package:meta/meta.dart';
+
+import 'library.dart';
+import 'dart_source_writer.dart';
 
 /// A definition for C function.
 class Func extends Element {
-  /// Name of the function
-  final String name;
-
   /// Parameter types.
   final List<String> parameterTypes;
 
@@ -58,12 +57,13 @@ class Func extends Element {
   final bool arc;
 
   const Func({
-    @required this.name,
+    String name,
     @required this.parameterTypes,
     List<String> parameterNames,
     @required this.returnType,
     this.arc = false,
-  }) : _parameterNames = parameterNames;
+  })  : _parameterNames = parameterNames,
+        super(name: name);
 
   @override
   void generateSource(DartSourceWriter w, Library library) {

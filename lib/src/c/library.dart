@@ -17,8 +17,10 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
-import 'package:ffi_tool/c.dart';
 import 'package:meta/meta.dart';
+
+import 'dart_source_writer.dart';
+import 'config.dart';
 
 /// A definition for a C library.
 class Library {
@@ -179,7 +181,10 @@ class Library {
 }
 
 abstract class Element {
-  const Element();
+  ///Name of this element
+  final String name;
+  
+  const Element({@required this.name});
 
   void generateSource(DartSourceWriter w, Library library);
 }

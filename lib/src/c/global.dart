@@ -18,14 +18,15 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-import 'package:ffi_tool/c.dart';
 import 'package:meta/meta.dart';
+
+import 'library.dart';
+import 'dart_source_writer.dart';
 
 /// A definition for a C global.
 class Global extends Element {
-  final String name;
   final String type;
-  const Global({@required this.name, @required this.type});
+  const Global({String name, @required this.type}) : super(name: name);
 
   @override
   void generateSource(DartSourceWriter w, Library library) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2019 ffi_tool authors.
+// Copyright (c) 2020 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,8 +18,10 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-import 'package:ffi_tool/c.dart';
 import 'package:meta/meta.dart';
+
+import 'dart_source_writer.dart';
+import 'library.dart';
 
 /// A definition for a C struct.
 ///
@@ -52,7 +54,6 @@ import 'package:meta/meta.dart';
 /// );
 /// ```
 class Struct extends Element {
-  final String name;
   final bool arc;
   final List<Field> fields;
 
@@ -63,12 +64,12 @@ class Struct extends Element {
   final String inject;
 
   const Struct({
-    @required this.name,
+    String name,
     this.arc = false,
     @required this.fields,
     this.comment,
     this.inject,
-  });
+  }) : super(name: name);
 
   @override
   void generateSource(DartSourceWriter w, Library library) {
