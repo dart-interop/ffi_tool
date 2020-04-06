@@ -48,7 +48,7 @@ final library = const Library.platformAware(
 
   // Optional imports
   importedUris: {
-    'package:example/library.dart',
+    ImportedUri('package:example/library.dart'),
   },
 
   /// List of generated functions, structs, and global variables
