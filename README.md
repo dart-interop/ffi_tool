@@ -65,7 +65,7 @@ final library = const Library.platformAware(
     Struct(
       name: 'ExampleStruct',
       fields: [
-        Field(
+        StructField(
           name: 'length',
           type: 'size_t',
         ),

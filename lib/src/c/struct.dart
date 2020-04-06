@@ -39,12 +39,12 @@ import 'library.dart';
 ///   elements: [
 ///     Struct(
 ///       name: "Coordinate",
-///       fields: <Field>[
-///         Field(
+///       fields: <StructField>[
+///         StructField(
 ///           type: 'double',
 ///           name: 'latitude',
 ///         ),
-///         Field(
+///         StructField(
 ///           type: 'double',
 ///           name: 'longitude',
 ///         ),
@@ -55,7 +55,7 @@ import 'library.dart';
 /// ```
 class Struct extends Element {
   final bool arc;
-  final List<Field> fields;
+  final List<StructField> fields;
 
   /// Optional source injected inside the generated class.
   final String inject;
@@ -130,8 +130,8 @@ class Struct extends Element {
   }
 }
 
-class Field {
+class StructField {
   final String name;
   final String type;
-  const Field({this.type, this.name});
+  const StructField({@required this.type, @required this.name});
 }

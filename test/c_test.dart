@@ -119,9 +119,9 @@ final Global1Type Global1 = _dynamicLibrary.lookup<Global1Type>(
       elements: [
         Struct(
           name: 'Coordinate',
-          fields: <Field>[
-            Field(type: 'double', name: 'latitude'),
-            Field(type: 'double', name: 'longitude')
+          fields: <StructField>[
+            StructField(type: 'double', name: 'latitude'),
+            StructField(type: 'double', name: 'longitude')
           ],
         ),
       ],
