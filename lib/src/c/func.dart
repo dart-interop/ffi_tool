@@ -57,13 +57,14 @@ class Func extends Element {
   final bool arc;
 
   const Func({
-    String name,
+    @required String name,
+    String documentation,
     @required this.parameterTypes,
     List<String> parameterNames,
     @required this.returnType,
     this.arc = false,
   })  : _parameterNames = parameterNames,
-        super(name: name);
+        super(name: name, documentation: documentation);
 
   @override
   void generateSource(DartSourceWriter w, Library library) {
@@ -77,7 +78,13 @@ class Func extends Element {
     w.write('\n');
 
     // Lookup
-    w.write('/// C function `$name`.\n');
+    if (documentation == null) {
+      w.write('/// C function `$name`.\n');
+    } else {
+      w.write('/// ');
+      w.writeAll(documentation.split('\n'), '\n/// ');
+      w.write('\n');
+    }
     w.write('${w.getDartType(returnType)} $name(');
     if (parameters.isNotEmpty) {
       w.write('\n');

@@ -26,14 +26,22 @@ import 'dart_source_writer.dart';
 /// A definition for a C global.
 class Global extends Element {
   final String type;
-  const Global({String name, @required this.type}) : super(name: name);
+  const Global(
+      {@required String name, @required this.type, String documentation})
+      : super(name: name, documentation: documentation);
 
   @override
   void generateSource(DartSourceWriter w, Library library) {
     final dartType = w.getDartType(type);
     final cType = w.getCType(type);
     w.write('\n');
-    w.write('/// C global `$name`.\n');
+        if (documentation == null) {
+      w.write('/// C global `$name`.\n');
+    } else {
+      w.write('/// ');
+      w.writeAll(documentation.split('\n'), '\n/// ');
+      w.write('\n');
+    }
     w.write(
         'final $dartType $name = ${library.dynamicLibraryIdentifier}.lookup<$cType>(\n');
     w.write('  \'$name\',\n');

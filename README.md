@@ -20,7 +20,7 @@ The advantages over handwritten _dart:ffi_ code are:
 In 'pubspec.yaml':
 ```yaml
 dev_dependencies:
-  ffi_tool: ^0.1.0
+  ffi_tool: ^0.2.5
 ```
 
 Run `pub get`.
@@ -56,6 +56,7 @@ final library = const Library.platformAware(
     // A definition for a function in C
     Func(
       name: 'Example',
+      documentation: 'Takes parameters and does stuff.',
       parameterTypes: ['int32', 'float32', '*void'],
       returnType: 'void',
     ),

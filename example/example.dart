@@ -16,6 +16,7 @@ final library = const Library.platformAware(
     // A function
     Func(
       name: 'Example',
+      documentation: 'Takes parameters and does stuff.',
       parameterTypes: ['int32', 'float64', '*void'],
       returnType: 'void',
     ),

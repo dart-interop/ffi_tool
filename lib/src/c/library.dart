@@ -181,10 +181,13 @@ class Library {
 }
 
 abstract class Element {
-  ///Name of this element
+  /// Name of this element
   final String name;
-  
-  const Element({@required this.name});
+
+  /// Optional documentation of this element
+  final String documentation;
+
+  const Element({@required this.name, this.documentation});
 
   void generateSource(DartSourceWriter w, Library library);
 }

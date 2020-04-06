@@ -57,19 +57,16 @@ class Struct extends Element {
   final bool arc;
   final List<Field> fields;
 
-  /// Optional comment.
-  final String comment;
-
   /// Optional source injected inside the generated class.
   final String inject;
 
   const Struct({
-    String name,
+    @required String name,
     this.arc = false,
     @required this.fields,
-    this.comment,
+    String documentation,
     this.inject,
-  }) : super(name: name);
+  }) : super(name: name, documentation: documentation);
 
   @override
   void generateSource(DartSourceWriter w, Library library) {
@@ -84,11 +81,11 @@ class Struct extends Element {
     }
 
     w.write('\n');
-    if (comment == null) {
+    if (documentation == null) {
       w.write('/// C struct `$name`.\n');
     } else {
       w.write('/// ');
-      w.writeAll(comment.split('\n'), '\n/// ');
+      w.writeAll(documentation.split('\n'), '\n/// ');
       w.write('\n');
     }
     w.write('class $name extends ffi.Struct {\n');
