@@ -180,6 +180,7 @@ class Library {
   }
 }
 
+/// Abstract base class for Func, Struct and Global.
 abstract class Element {
   /// Name of this element
   final String name;

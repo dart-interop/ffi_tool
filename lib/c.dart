@@ -23,7 +23,7 @@ library ffi_tool.c;
 
 export 'src/c/config.dart';
 export 'src/c/generate_file.dart';
-export 'src/c/library.dart' hide Element;
+export 'src/c/library.dart';
 export 'src/c/func.dart' hide Parameter;
 export 'src/c/struct.dart';
 export 'src/c/global.dart';
