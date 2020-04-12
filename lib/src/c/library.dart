@@ -91,9 +91,26 @@ class Library {
   })  : dynamicLibraryPath = null,
         dynamicLibraryConfig = null;
 
+  ///Creates a library without caring about the underlying library. You have to set it manually using the init() function of the generated file at runtime.
+  const Library.withoutLoading({
+    @required this.elements,
+    this.libraryName,
+    this.partOf,
+    this.importedUris = const {},
+    this.parts = const {},
+    this.dynamicLibraryIdentifier = '_dynamicLibrary',
+  })  : dynamicLibraryPath = null,
+        dynamicLibraryConfig = null,
+        customLoadCode = null;
+
   bool get _platformAware => dynamicLibraryConfig != null;
 
   bool get _customLoadCode => customLoadCode != null;
+
+  bool get _withoutLoading =>
+      dynamicLibraryConfig == null &&
+      customLoadCode == null &&
+      dynamicLibraryPath == null;
 
   void generateSource(DartSourceWriter w) {
     w.libraryName = libraryName;
@@ -119,7 +136,15 @@ class Library {
       w.write('\n');
     }
     w.write('/// Dynamic library\n');
-    if (_customLoadCode) {
+    if (_withoutLoading) {
+      w.write('ffi.DynamicLibrary ${dynamicLibraryIdentifier};');
+      w.write('\n\n');
+      w.write('''/// Initialises the generated code using `library`. This must be the first call to this file.
+void init(ffi.DynamicLibrary library){
+    ${dynamicLibraryIdentifier}=library;
+}
+''');
+    } else if (_customLoadCode) {
       w.write(
           'final ffi.DynamicLibrary ${dynamicLibraryIdentifier} = _open();');
       w.write('\n');
