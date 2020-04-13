@@ -26,6 +26,9 @@ import 'config.dart';
 class Library {
   final String dynamicLibraryIdentifier;
 
+  /// A preamble which is simply copied to the generated file.
+  final String preamble;
+
   /// Custom load code to load the underlying dynamic library, only non-null if created with the `Library.customLoadCode` constructor.
   final String customLoadCode;
 
@@ -58,6 +61,7 @@ class Library {
     @required this.elements,
     this.libraryName,
     this.partOf,
+    this.preamble = '// AUTOMATICALLY GENERATED. DO NOT EDIT.',
     this.importedUris = const {},
     this.parts = const {},
     this.dynamicLibraryIdentifier = '_dynamicLibrary',
@@ -70,6 +74,7 @@ class Library {
     @required this.elements,
     this.libraryName,
     this.partOf,
+    this.preamble = '// AUTOMATICALLY GENERATED. DO NOT EDIT.',
     this.importedUris = const {},
     this.parts = const {},
     this.dynamicLibraryIdentifier = '_dynamicLibrary',
@@ -85,6 +90,7 @@ class Library {
     @required this.elements,
     this.libraryName,
     this.partOf,
+    this.preamble = '// AUTOMATICALLY GENERATED. DO NOT EDIT.',
     this.importedUris = const {},
     this.parts = const {},
     this.dynamicLibraryIdentifier = '_dynamicLibrary',
@@ -96,6 +102,7 @@ class Library {
     @required this.elements,
     this.libraryName,
     this.partOf,
+    this.preamble = '// AUTOMATICALLY GENERATED. DO NOT EDIT.',
     this.importedUris = const {},
     this.parts = const {},
     this.dynamicLibraryIdentifier = '_dynamicLibrary',
@@ -115,6 +122,7 @@ class Library {
   void generateSource(DartSourceWriter w) {
     w.libraryName = libraryName;
     w.partOf = partOf;
+    w.preamble = preamble;
 
     // Imports
     w.imports.add(const ImportedUri('dart:ffi', prefix: 'ffi'));
@@ -139,7 +147,8 @@ class Library {
     if (_withoutLoading) {
       w.write('ffi.DynamicLibrary ${dynamicLibraryIdentifier};');
       w.write('\n\n');
-      w.write('''/// Initialises the generated code using `library`. This must be the first call to this file.
+      w.write(
+          '''/// Initialises the generated code using `library`. This must be the first call to this file.
 void init(ffi.DynamicLibrary library){
     ${dynamicLibraryIdentifier}=library;
 }

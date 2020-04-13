@@ -59,6 +59,7 @@ const _types = <String, _Type>{
 class DartSourceWriter {
   String libraryName;
   String partOf;
+  String preamble;
   final Set<ImportedUri> imports = {};
   final Set<String> parts = {};
   final StringBuffer _sb = StringBuffer();
@@ -133,7 +134,8 @@ class DartSourceWriter {
   @override
   String toString() {
     final sb = StringBuffer();
-    sb.write('// AUTOMATICALLY GENERATED. DO NOT EDIT.\n');
+    sb.write(preamble);
+    sb.write('\n');
 
     // Library name
     if (libraryName != null) {
