@@ -34,7 +34,8 @@ void generateFile(File file, Library library, {bool format = true}) {
 
 /// Formats a file with 'dartfmt'
 void _dartFmt(String path) {
-  final result = Process.runSync('dartfmt', ['-w', path]);
+  final result =
+      Process.runSync('dartfmt', ['-w', path], runInShell: Platform.isWindows);
   print(result.stdout);
   print(result.stderr);
 }
