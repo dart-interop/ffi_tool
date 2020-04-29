@@ -1,5 +1,5 @@
 name: ffi_tool
-version: 0.2.5
+version: 0.3.0
 description: A tool for generating 'dart:ffi' bindings for C and Objective-C libraries.
 homepage: https://github.com/dart-interop/ffi_tool
 

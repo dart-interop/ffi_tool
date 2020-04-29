@@ -14,13 +14,14 @@ The advantages over handwritten _dart:ffi_ code are:
   * __Possibly better readability__
     * You can use the original identifiers (such as `*size_t` instead of `Pointer<IntPtr>`).
     * You can define aliases, e.g. `const len_t = 'int32';`.
+    * You can configure how a shared library is loaded at runtime.
 
 # Getting started
 ## 1.Add dependency
 In 'pubspec.yaml':
 ```yaml
 dev_dependencies:
-  ffi_tool: ^0.2.5
+  ffi_tool: ^0.3.0
 ```
 
 Run `pub get`.
@@ -46,6 +47,9 @@ final library = const Library.platformAware(
       android: DynamicLibraryPlatformConfig.open('path/to/library.so'),
       iOS: DynamicLibraryPlatformConfig.process()),
 
+  // Optional library preamble
+  preamble = '// Licensed under MIT license\r\n// AUTOMATICALLY GENERATED. DO NOT EDIT.'
+  
   // Optional imports
   importedUris: {
     ImportedUri('package:example/library.dart'),
