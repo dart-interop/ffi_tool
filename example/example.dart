@@ -26,5 +26,42 @@ final library = const Library.platformAware(
       name: 'ExampleGlobal',
       type: 'int32',
     ),
+
+    // A Struct
+    Struct(
+      name: 'ExampleStruct',
+      fields: [
+        StructField(
+          name: 'exampleInt',
+          type: 'int32'
+        ),
+      ]
+    ),
+
+    // A constant
+    Constant(
+      name: 'exampleConstant',
+      type: 'int',
+      value: '10',
+      documentation: 'A constant',
+    ),
+
+    // A group of constants
+    GroupedConstants(
+      name: 'ExampleConstantGroup',
+      documentation: 'Just an Example of using GroupedConstants',
+      constants: [
+        Constant(
+          name: 'exampleintConstant',
+          type: 'double',
+          value: '10.2',
+        ),
+        Constant(
+          name: 'exampleStringConstant',
+          type: 'String',
+          value: '"example string"',
+        ),
+      ],
+    ),
   ],
 );

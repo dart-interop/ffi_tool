@@ -190,4 +190,85 @@ typedef _Example_C = ffi.Pointer Function();
 typedef _Example_Dart = ffi.Pointer Function();
 ''');
   });
+
+  test('Constants', () {
+    final library = Library(
+      dynamicLibraryPath: 'path/to/library',
+      importedUris: {},
+      elements: [
+        Constant(
+            name: 'a',
+            type: 'int',
+            value: '10',
+            documentation: 'test doc line 1\ntest doc line 2'),
+        Constant(
+          name: 'b',
+          type: 'String',
+          value: '"test string"',
+        ),
+      ],
+    );
+    expect(library.toString(), '''
+// AUTOMATICALLY GENERATED. DO NOT EDIT.
+
+import 'dart:ffi' as ffi;
+
+/// Dynamic library
+final ffi.DynamicLibrary _dynamicLibrary = ffi.DynamicLibrary.open(
+  'path/to/library',
+);
+
+/// test doc line 1
+/// test doc line 2
+const int a = 10;
+
+const String b = "test string";
+''');
+  });
+
+  test('GroupedConstants', () {
+    final library = Library(
+      dynamicLibraryPath: 'path/to/library',
+      importedUris: {},
+      elements: [
+        GroupedConstants(
+          name: 'Constants',
+          documentation: 'test line 1\ntest line 2',
+          constants: [
+            Constant(
+                name: 'a',
+                type: 'int',
+                value: '10',
+                documentation: 'test doc line 1\ntest doc line 2'),
+            Constant(
+              name: 'b',
+              type: 'String',
+              value: '"test string"',
+            ),
+          ],
+        ),
+      ],
+    );
+    expect(library.toString(), '''
+// AUTOMATICALLY GENERATED. DO NOT EDIT.
+
+import 'dart:ffi' as ffi;
+
+/// Dynamic library
+final ffi.DynamicLibrary _dynamicLibrary = ffi.DynamicLibrary.open(
+  'path/to/library',
+);
+
+/// test line 1
+/// test line 2
+class Constants {
+
+  /// test doc line 1
+  /// test doc line 2
+  static const int a = 10;
+
+  static const String b = "test string";
+}
+''');
+  });
 }
