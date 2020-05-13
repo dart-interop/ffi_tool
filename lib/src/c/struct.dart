@@ -1,4 +1,4 @@
-// Copyright (c) 2019 ffi_tool authors.
+// Copyright (c) 2020 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,8 +18,10 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-import 'package:ffi_tool/c.dart';
 import 'package:meta/meta.dart';
+
+import 'dart_source_writer.dart';
+import 'library.dart';
 
 /// A definition for a C struct.
 ///
@@ -37,12 +39,12 @@ import 'package:meta/meta.dart';
 ///   elements: [
 ///     Struct(
 ///       name: "Coordinate",
-///       fields: <Field>[
-///         Field(
+///       fields: <StructField>[
+///         StructField(
 ///           type: 'double',
 ///           name: 'latitude',
 ///         ),
-///         Field(
+///         StructField(
 ///           type: 'double',
 ///           name: 'longitude',
 ///         ),
@@ -52,23 +54,19 @@ import 'package:meta/meta.dart';
 /// );
 /// ```
 class Struct extends Element {
-  final String name;
   final bool arc;
-  final List<Field> fields;
-
-  /// Optional comment.
-  final String comment;
+  final List<StructField> fields;
 
   /// Optional source injected inside the generated class.
   final String inject;
 
   const Struct({
-    @required this.name,
+    @required String name,
     this.arc = false,
     @required this.fields,
-    this.comment,
+    String documentation,
     this.inject,
-  });
+  }) : super(name: name, documentation: documentation);
 
   @override
   void generateSource(DartSourceWriter w, Library library) {
@@ -83,11 +81,11 @@ class Struct extends Element {
     }
 
     w.write('\n');
-    if (comment == null) {
+    if (documentation == null) {
       w.write('/// C struct `$name`.\n');
     } else {
       w.write('/// ');
-      w.writeAll(comment.split('\n'), '\n/// ');
+      w.writeAll(documentation.split('\n'), '\n/// ');
       w.write('\n');
     }
     w.write('class $name extends ffi.Struct {\n');
@@ -132,8 +130,8 @@ class Struct extends Element {
   }
 }
 
-class Field {
+class StructField {
   final String name;
   final String type;
-  const Field({this.type, this.name});
+  const StructField({@required this.type, @required this.name});
 }

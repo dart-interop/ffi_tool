@@ -1,3 +1,17 @@
+# 0.3.0
+  * Configure how a dynamic library should be loaded depending on the platform,
+    explicitly give the load code, or make the user responsible for loading at runtime.
+
+  * You can now add documentation to functions, structs and globals
+    and preambles (e.g. for including licenses) to generated licenses.
+
+  * BREAKING: DartSourceWriter and Parameter class removed from public API
+    (although they were not meant to be used outside this package in the first place).
+
+  * BREAKING: Renamed the class Field to StructField, since its only used for structs.
+
+  * Further bug fixes
+
 # 0.2.5
   * Fixes issues caused by a breaking change after a pull request didn't go through enough code
     review.

@@ -1,4 +1,4 @@
-// Copyright (c) 2019 ffi_tool authors.
+// Copyright (c) 2020 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the 'Software'), to deal
@@ -18,9 +18,10 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-import 'package:ffi_tool/c.dart';
-import 'library.dart';
 import 'dart:io';
+
+import 'library.dart';
+import 'dart_source_writer.dart';
 
 /// Generates [file] by generating C bindings for [library].
 /// If format is true 'dartfmt -w $PATH' will be run to format the generated file.
@@ -33,7 +34,8 @@ void generateFile(File file, Library library, {bool format = true}) {
 
 /// Formats a file with 'dartfmt'
 void _dartFmt(String path) {
-  final result = Process.runSync('dartfmt', ['-w', path]);
+  final result =
+      Process.runSync('dartfmt', ['-w', path], runInShell: Platform.isWindows);
   print(result.stdout);
   print(result.stderr);
 }
