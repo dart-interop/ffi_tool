@@ -1,4 +1,4 @@
-// Copyright (c) 2019 ffi_tool authors.
+// Copyright (c) 2020 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,10 @@
 /// Generates 'dart:ffi' bindings for C libraries.
 library ffi_tool.c;
 
+export 'src/c/config.dart';
 export 'src/c/generate_file.dart';
 export 'src/c/library.dart';
-export 'src/c/func.dart';
+export 'src/c/func.dart' hide Parameter;
 export 'src/c/struct.dart';
 export 'src/c/global.dart';
-export 'src/c/dart_source_writer.dart';
+export 'src/c/dart_source_writer.dart' hide DartSourceWriter;

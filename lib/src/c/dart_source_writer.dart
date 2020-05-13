@@ -1,4 +1,4 @@
-// Copyright (c) 2019 ffi_tool authors.
+// Copyright (c) 2021 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,17 +25,6 @@ const _types = <String, _Type>{
   '*void': _Type(ffi: 'ffi.Pointer', dart: 'ffi.Pointer'),
   'void': _Type(ffi: 'ffi.Void', dart: 'void'),
 
-  '*utf8': _Type(
-    ffi: 'ffi.Pointer<ffi.Utf8>',
-    dart: 'ffi.Pointer<ffi.Utf8>',
-    importInfo: ImportedUri('package:ffi/ffi.dart', prefix: 'ffi'),
-  ),
-  '*utf16': _Type(
-    ffi: 'ffi.Pointer<ffi.Utf16>',
-    dart: 'ffi.Pointer<ffi.Utf16>',
-    importInfo: ImportedUri('package:ffi/ffi.dart', prefix: 'ffi'),
-  ),
-
   'intptr': _Type(ffi: 'ffi.IntPtr', dart: 'int'),
 
   // For convenience
@@ -59,6 +48,7 @@ const _types = <String, _Type>{
 class DartSourceWriter {
   String libraryName;
   String partOf;
+  String preamble;
   final Set<ImportedUri> imports = {};
   final Set<String> parts = {};
   final StringBuffer _sb = StringBuffer();
@@ -133,7 +123,8 @@ class DartSourceWriter {
   @override
   String toString() {
     final sb = StringBuffer();
-    sb.write('// AUTOMATICALLY GENERATED. DO NOT EDIT.\n');
+    sb.write(preamble);
+    sb.write('\n');
 
     // Library name
     if (libraryName != null) {
@@ -153,8 +144,16 @@ class DartSourceWriter {
       for (var importInfo in imports.toList()..sort()) {
         sb.write("import '${importInfo.uri}'");
         final prefix = importInfo.prefix;
+        final show = importInfo.show;
+        final hide = importInfo.hide;
         if (prefix != null) {
           sb.write(' as $prefix');
+        }
+        if (show != null) {
+          sb.write(' show $show');
+        }
+        if (hide != null) {
+          sb.write(' hide $hide');
         }
         sb.write(';\n');
       }
@@ -186,8 +185,10 @@ class DartSourceWriter {
 class ImportedUri implements Comparable<ImportedUri> {
   final String uri;
   final String prefix;
+  final String show;
+  final String hide;
 
-  const ImportedUri(this.uri, {this.prefix});
+  const ImportedUri(this.uri, {this.prefix, this.show, this.hide});
 
   @override
   int get hashCode => uri.hashCode;

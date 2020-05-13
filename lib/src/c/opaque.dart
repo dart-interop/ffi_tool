@@ -37,102 +37,44 @@ import 'library.dart';
 ///   dynamicLibraryPath: "path/to/library",
 ///
 ///   elements: [
-///     Struct(
-///       name: "Coordinate",
-///       fields: <StructField>[
-///         StructField(
-///           type: 'double',
-///           name: 'latitude',
-///         ),
-///         StructField(
-///           type: 'double',
-///           name: 'longitude',
-///         ),
-///       ],
+///     Opaque(
+///       name: "StructWithoutContent"
 ///     ),
 ///   ],
 /// );
 /// ```
-class Struct extends Element {
-  final bool arc;
-  final List<StructField> fields;
-
+class Opaque extends Element {
   /// Optional source injected inside the generated class.
   final String inject;
 
-  const Struct({
+  const Opaque({
     @required String name,
-    this.arc = false,
-    @required this.fields,
     String documentation,
     this.inject,
   }) : super(name: name, documentation: documentation);
 
   @override
   void generateSource(DartSourceWriter w, Library library) {
-    if (fields.isEmpty) {
-      throw Exception(
-          'Structs may no longer by empty and must contain at least one field! Consider using a Opaque instead!');
-    }
-    if (arc) {
-      w.imports.add(
-        const ImportedUri('package:cupertino_ffi/ffi.dart', prefix: 'ffi'),
-      );
-    }
-
     w.write('\n');
     if (documentation == null) {
-      w.write('/// C struct `$name`.\n');
+      w.write('/// C opaque struct `$name`.\n');
     } else {
       w.write('/// ');
       w.writeAll(documentation.split('\n'), '\n/// ');
       w.write('\n');
     }
-    w.write('class $name extends ffi.Struct {\n');
-    w.write('  \n');
 
     //
-    // Write fields
-    //
-    for (var field in fields) {
-      // Some types (Int32, Float32, etc.) need to be annotated
-      final annotationName = w.getPropertyAnnotationType(field.type);
-      if (annotationName != null && annotationName != 'ffi.Pointer') {
-        w.write('  @$annotationName()\n');
-      }
-      w.write('  ${w.getDartType(field.type)} ${field.name};\n');
-      w.write('  \n');
-    }
-
-    //
-    // Write factory
-    //
-    w.write(
-        '  static ffi.Pointer<$name> allocate(ffi.Allocator allocator) {\n');
-    if (arc) {
-      w.write('    final result = allocator.allocate<$name>();\n');
-      w.write('    ffi.arcAdd(result);\n');
-      w.write('    return result;\n');
-    } else {
-      w.write('    return allocator.allocate<$name>();\n');
-    }
-    w.write('  }\n');
-    w.write('  \n');
-
-    //
-    // Write injected source
+    // Write injected source if any or just generate class
     //
     final inject = this.inject;
     if (inject != null) {
+      w.write('class $name extends ffi.Opaque {');
+      w.write('  \n');
       w.write(inject);
+      w.write('}\n');
+    } else {
+      w.write('class $name extends ffi.Opaque {}\n');
     }
-
-    w.write('}\n');
   }
-}
-
-class StructField {
-  final String name;
-  final String type;
-  const StructField({@required this.type, @required this.name});
 }

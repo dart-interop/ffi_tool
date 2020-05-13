@@ -22,8 +22,8 @@ void main() {
       elements: [
         Func(
           name: 'Example',
-          parameterTypes: ['Int32', 'Float32', '*void', 'void'],
-          returnType: '*utf8',
+          parameterTypes: ['Int32', 'Float32', '*void'],
+          returnType: '*uint8',
         ),
       ],
     );
@@ -41,7 +41,6 @@ void main() {
 // AUTOMATICALLY GENERATED. DO NOT EDIT.
 
 import 'dart:ffi' as ffi;
-import 'package:ffi/ffi.dart' as ffi;
 
 /// Dynamic library
 final ffi.DynamicLibrary dynamicLibraryForExampleLibrary = ffi.DynamicLibrary.open(
@@ -49,7 +48,7 @@ final ffi.DynamicLibrary dynamicLibraryForExampleLibrary = ffi.DynamicLibrary.op
 );
 
 /// C function `Example`.
-ffi.Pointer<ffi.Utf8> Example(
+ffi.Pointer<ffi.Uint8> Example(
   int arg0,
   double arg1,
   ffi.Pointer arg2,
@@ -60,13 +59,13 @@ ffi.Pointer<ffi.Utf8> Example(
 final _Example_Dart _Example = dynamicLibraryForExampleLibrary.lookupFunction<_Example_C, _Example_Dart>(
   'Example',
 );
-typedef _Example_C = ffi.Pointer<ffi.Utf8> Function(
+typedef _Example_C = ffi.Pointer<ffi.Uint8> Function(
   ffi.Int32 arg0,
   ffi.Float arg1,
   ffi.Pointer arg2,
   ffi.Void arg3,
 );
-typedef _Example_Dart = ffi.Pointer<ffi.Utf8> Function(
+typedef _Example_Dart = ffi.Pointer<ffi.Uint8> Function(
   int arg0,
   double arg1,
   ffi.Pointer arg2,
@@ -119,9 +118,9 @@ final Global1Type Global1 = _dynamicLibrary.lookup<Global1Type>(
       elements: [
         Struct(
           name: 'Coordinate',
-          fields: <Field>[
-            Field(type: 'double', name: 'latitude'),
-            Field(type: 'double', name: 'longitude')
+          fields: <StructField>[
+            StructField(type: 'double', name: 'latitude'),
+            StructField(type: 'double', name: 'longitude')
           ],
         ),
       ],
@@ -130,7 +129,6 @@ final Global1Type Global1 = _dynamicLibrary.lookup<Global1Type>(
 // AUTOMATICALLY GENERATED. DO NOT EDIT.
 
 import 'dart:ffi' as ffi;
-import 'package:ffi/ffi.dart' as ffi;
 
 /// Dynamic library
 final ffi.DynamicLibrary dynamicLibraryForExampleLibrary = ffi.DynamicLibrary.open(
