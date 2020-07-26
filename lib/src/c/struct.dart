@@ -97,7 +97,7 @@ class Struct extends Element {
     for (var field in fields) {
       // Some types (Int32, Float32, etc.) need to be annotated
       final annotationName = w.getPropertyAnnotationType(field.type);
-      if (annotationName != null) {
+      if (annotationName != null && annotationName != 'ffi.Pointer') {
         w.write('  @$annotationName()\n');
       }
       w.write('  ${w.getDartType(field.type)} ${field.name};\n');
