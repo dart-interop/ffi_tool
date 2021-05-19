@@ -18,8 +18,6 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-import 'package:meta/meta.dart';
-
 import 'dart_source_writer.dart';
 import 'library.dart';
 
@@ -58,13 +56,13 @@ class Struct extends Element {
   final List<StructField> fields;
 
   /// Optional source injected inside the generated class.
-  final String inject;
+  final String? inject;
 
   const Struct({
-    @required String name,
+    required String name,
     this.arc = false,
-    @required this.fields,
-    String documentation,
+    required this.fields,
+    String? documentation,
     this.inject,
   }) : super(name: name, documentation: documentation);
 
@@ -85,7 +83,7 @@ class Struct extends Element {
       w.write('/// C struct `$name`.\n');
     } else {
       w.write('/// ');
-      w.writeAll(documentation.split('\n'), '\n/// ');
+      w.writeAll(documentation!.split('\n'), '\n/// ');
       w.write('\n');
     }
     w.write('class $name extends ffi.Struct {\n');
@@ -134,5 +132,5 @@ class Struct extends Element {
 class StructField {
   final String name;
   final String type;
-  const StructField({@required this.type, @required this.name});
+  const StructField({required this.type, required this.name});
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2020 ffi_tool authors.
+// Copyright (c) 2021 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the 'Software'), to deal
@@ -18,8 +18,6 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-import 'package:meta/meta.dart';
-
 import 'library.dart';
 import 'dart_source_writer.dart';
 
@@ -31,15 +29,15 @@ class Func extends Element {
   /// Parameter names.
   List<String> get parameterNames => parameters.map((p) => p.name).toList();
 
-  final List<String> _parameterNames;
+  final List<String>? _parameterNames;
 
   /// Parameters.
   List<Parameter> get parameters => List<Parameter>.generate(
         parameterTypes.length,
         (i) {
           final type = parameterTypes[i];
-          final name = (_parameterNames != null && i < _parameterNames.length)
-              ? _parameterNames[i]
+          final name = (_parameterNames != null && i < _parameterNames!.length)
+              ? _parameterNames![i]
               : 'arg$i';
           return Parameter(type: type, name: name);
         },
@@ -57,11 +55,11 @@ class Func extends Element {
   final bool arc;
 
   const Func({
-    @required String name,
-    String documentation,
-    @required this.parameterTypes,
-    List<String> parameterNames,
-    @required this.returnType,
+    required String name,
+    String? documentation,
+    required this.parameterTypes,
+    List<String>? parameterNames,
+    required this.returnType,
     this.arc = false,
   })  : _parameterNames = parameterNames,
         super(name: name, documentation: documentation);
@@ -82,7 +80,7 @@ class Func extends Element {
       w.write('/// C function `$name`.\n');
     } else {
       w.write('/// ');
-      w.writeAll(documentation.split('\n'), '\n/// ');
+      w.writeAll(documentation!.split('\n'), '\n/// ');
       w.write('\n');
     }
     w.write('${w.getDartType(returnType)} $name(');
@@ -149,7 +147,7 @@ class Parameter {
   final String name;
   final String type;
   const Parameter({
-    this.type,
-    this.name,
+    required this.type,
+    required this.name,
   });
 }

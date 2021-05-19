@@ -1,4 +1,4 @@
-// Copyright (c) 2020 ffi_tool authors.
+// Copyright (c) 2021 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the 'Software'), to deal
@@ -26,7 +26,7 @@ enum _DynamicLibraryCreationMode { executable, open, process }
 ///See `DynamicLibrary` for more information.
 class DynamicLibraryPlatformConfig {
   final _DynamicLibraryCreationMode _creationMode;
-  final String _path;
+  final String? _path;
 
   const DynamicLibraryPlatformConfig.executable()
       : _path = null,
@@ -45,32 +45,30 @@ class DynamicLibraryPlatformConfig {
     switch (_creationMode) {
       case _DynamicLibraryCreationMode.executable:
         return 'DynamicLibrary.executable()';
-        break;
       case _DynamicLibraryCreationMode.open:
         return 'DynamicLibrary.open(\'$_path\')';
-        break;
       case _DynamicLibraryCreationMode.process:
         return 'DynamicLibrary.process()';
-        break;
+      default:
+        return '';
     }
-    return null;
   }
 }
 
 /// Defines, how the dynamic library should be loaded on each of darts known platforms.
 ///
 /// If the `DynamicLibraryPlatformConfig` is `null` for a platform, this platform will fallback to `other`.
-/// If `other` is `null`, executing on each platform falling back to it 
+/// If `other` is `null`, executing on each platform falling back to it
 /// and on all platforms that do not match any known platform (e.g. windows, linux, ...),
 /// will throw an `UnsupportedError`
 class DynamicLibraryConfig {
-  final DynamicLibraryPlatformConfig windows;
-  final DynamicLibraryPlatformConfig linux;
-  final DynamicLibraryPlatformConfig macOS;
-  final DynamicLibraryPlatformConfig iOS;
-  final DynamicLibraryPlatformConfig android;
-  final DynamicLibraryPlatformConfig fuchsia;
-  final DynamicLibraryPlatformConfig other;
+  final DynamicLibraryPlatformConfig? windows;
+  final DynamicLibraryPlatformConfig? linux;
+  final DynamicLibraryPlatformConfig? macOS;
+  final DynamicLibraryPlatformConfig? iOS;
+  final DynamicLibraryPlatformConfig? android;
+  final DynamicLibraryPlatformConfig? fuchsia;
+  final DynamicLibraryPlatformConfig? other;
 
   const DynamicLibraryConfig(
       {this.windows,

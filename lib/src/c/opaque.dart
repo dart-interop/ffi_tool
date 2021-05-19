@@ -18,8 +18,6 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-import 'package:meta/meta.dart';
-
 import 'dart_source_writer.dart';
 import 'library.dart';
 
@@ -45,11 +43,11 @@ import 'library.dart';
 /// ```
 class Opaque extends Element {
   /// Optional source injected inside the generated class.
-  final String inject;
+  final String? inject;
 
   const Opaque({
-    @required String name,
-    String documentation,
+    required String name,
+    String? documentation,
     this.inject,
   }) : super(name: name, documentation: documentation);
 
@@ -60,7 +58,7 @@ class Opaque extends Element {
       w.write('/// C opaque struct `$name`.\n');
     } else {
       w.write('/// ');
-      w.writeAll(documentation.split('\n'), '\n/// ');
+      w.writeAll(documentation!.split('\n'), '\n/// ');
       w.write('\n');
     }
 
