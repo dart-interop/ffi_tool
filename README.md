@@ -17,10 +17,14 @@ The advantages over handwritten _dart:ffi_ code are:
 
 # Getting started
 ## 1.Add dependency
+The version of this package hosted on pub is outdated, use the newest version from github!
 In 'pubspec.yaml':
 ```yaml
 dev_dependencies:
-  ffi_tool: ^0.4.0
+  ffi_tool:
+    git:
+      url: git://github.com/dart-interop/ffi_tool.git
+      ref: v0.4.0
 ```
 
 Run `pub get`.
