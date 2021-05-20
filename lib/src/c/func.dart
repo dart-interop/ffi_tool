@@ -65,13 +65,7 @@ class Func extends Element {
         super(name: name, documentation: documentation);
 
   @override
-  void generateSource(DartSourceWriter w, Library library) {
-    if (arc) {
-      w.imports.add(
-        const ImportedUri('package:cupertino_ffi/objc.dart', prefix: 'ffi'),
-      );
-    }
-    final typedefC = '_${name}_C';
+  void generateInnerSource(DartSourceWriter w, Library library) {
     final typedefDart = '_${name}_Dart';
     w.write('\n');
 
@@ -111,12 +105,29 @@ class Func extends Element {
       }
     }
     w.write('}\n');
-    w.write('final $typedefDart _$name = ');
-    w.write(
-        '${library.dynamicLibraryIdentifier}.lookupFunction<$typedefC, $typedefDart>(\n');
-    w.write('  \'$name\',\n');
-    w.write(');\n');
+    w.write('final $typedefDart _$name;');
+  }
 
+  @override
+  bool generateConstructorSource(DartSourceWriter w, Library library) {
+    final typedefC = '_${name}_C';
+    final typedefDart = '_${name}_Dart';
+    w.write(
+        '_$name = ${Library.dynamicLibraryIdentifier}.lookupFunction<$typedefC, $typedefDart>(\n');
+    w.write('  \'$name\',\n');
+    w.write(')\n');
+    return true;
+  }
+
+  @override
+  void generateOuterSource(DartSourceWriter w, Library library) {
+    if (arc) {
+      w.imports.add(
+        const ImportedUri('package:cupertino_ffi/objc.dart', prefix: 'ffi'),
+      );
+    }
+    final typedefC = '_${name}_C';
+    final typedefDart = '_${name}_Dart';
     // C type
     {
       w.write('typedef $typedefC = ${w.getCType(returnType)} Function(');

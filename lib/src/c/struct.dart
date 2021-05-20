@@ -67,7 +67,7 @@ class Struct extends Element {
   }) : super(name: name, documentation: documentation);
 
   @override
-  void generateSource(DartSourceWriter w, Library library) {
+  void generateOuterSource(DartSourceWriter w, Library library) {
     if (fields.isEmpty) {
       throw Exception(
           'Structs may no longer by empty and must contain at least one field! Consider using a Opaque instead!');
@@ -108,11 +108,12 @@ class Struct extends Element {
     w.write(
         '  static ffi.Pointer<$name> allocate(ffi.Allocator allocator) {\n');
     if (arc) {
-      w.write('    final result = allocator.allocate<$name>();\n');
+      w.write(
+          '    final result = allocator.allocate<$name>(ffi.sizeOf<$name>());\n');
       w.write('    ffi.arcAdd(result);\n');
       w.write('    return result;\n');
     } else {
-      w.write('    return allocator.allocate<$name>();\n');
+      w.write('    return allocator.allocate<$name>(ffi.sizeOf<$name>());\n');
     }
     w.write('  }\n');
     w.write('  \n');
@@ -127,6 +128,12 @@ class Struct extends Element {
 
     w.write('}\n');
   }
+
+  @override
+  void generateInnerSource(DartSourceWriter w, Library library) {}
+
+  @override
+  bool generateConstructorSource(DartSourceWriter w, Library library) => false;
 }
 
 class StructField {

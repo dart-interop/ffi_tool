@@ -21,7 +21,7 @@
 import 'dart_source_writer.dart';
 import 'library.dart';
 
-/// A definition for a C struct.
+/// A definition for a C opaque struct.
 ///
 /// ```dart
 /// import 'package:ffi_tool/c.dart';
@@ -52,7 +52,7 @@ class Opaque extends Element {
   }) : super(name: name, documentation: documentation);
 
   @override
-  void generateSource(DartSourceWriter w, Library library) {
+  void generateOuterSource(DartSourceWriter w, Library library) {
     w.write('\n');
     if (documentation == null) {
       w.write('/// C opaque struct `$name`.\n');
@@ -75,4 +75,10 @@ class Opaque extends Element {
       w.write('class $name extends ffi.Opaque {}\n');
     }
   }
+
+  @override
+  void generateInnerSource(DartSourceWriter w, Library library) {}
+
+  @override
+  bool generateConstructorSource(DartSourceWriter w, Library library) => false;
 }

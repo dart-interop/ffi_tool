@@ -29,9 +29,8 @@ class Global extends Element {
       : super(name: name, documentation: documentation);
 
   @override
-  void generateSource(DartSourceWriter w, Library library) {
+  void generateInnerSource(DartSourceWriter w, Library library) {
     final dartType = w.getDartType(type);
-    final cType = w.getCType(type);
     w.write('\n');
     if (documentation == null) {
       w.write('/// C global `$name`.\n');
@@ -40,9 +39,18 @@ class Global extends Element {
       w.writeAll(documentation!.split('\n'), '\n/// ');
       w.write('\n');
     }
-    w.write(
-        'final $dartType $name = ${library.dynamicLibraryIdentifier}.lookup<$cType>(\n');
+    w.write('final $dartType $name;\n');
+  }
+
+  @override
+  void generateOuterSource(DartSourceWriter w, Library library) {}
+
+  @override
+  bool generateConstructorSource(DartSourceWriter w, Library library) {
+    final cType = w.getCType(type);
+    w.write('$name = ${Library.dynamicLibraryIdentifier}.lookup<$cType>(\n');
     w.write('  \'$name\',\n');
-    w.write(').value;\n');
+    w.write(').value\n');
+    return true;
   }
 }
