@@ -26,5 +26,6 @@ export 'src/c/generate_file.dart';
 export 'src/c/library.dart';
 export 'src/c/func.dart' hide Parameter;
 export 'src/c/struct.dart';
+export 'src/c/opaque.dart';
 export 'src/c/global.dart';
 export 'src/c/dart_source_writer.dart' hide DartSourceWriter;

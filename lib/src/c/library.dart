@@ -1,4 +1,4 @@
-// Copyright (c) 2020 ffi_tool authors.
+// Copyright (c) 2021 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the 'Software'), to deal
@@ -17,98 +17,114 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
-import 'package:meta/meta.dart';
 
 import 'dart_source_writer.dart';
 import 'config.dart';
 
 /// A definition for a C library.
 class Library {
-  final String dynamicLibraryIdentifier;
+  /// The name for the class all functions and globals are placed in.
+  ///
+  /// This is required since version 0.4.0 of this package due to null safety.
+  final String containerClassName;
 
   /// A preamble which is simply copied to the generated file.
-  final String preamble;
+  final String? preamble;
 
   /// Custom load code to load the underlying dynamic library, only non-null if created with the `Library.customLoadCode` constructor.
-  final String customLoadCode;
+  final String? customLoadCode;
 
   /// If the library was created with the default constructor and is not platform aware this represents the path of the underlying dynamic library.
-  final String dynamicLibraryPath;
+  final String? dynamicLibraryPath;
 
-  ///If this library is platform aware, this represents the platform config.
-  final DynamicLibraryConfig dynamicLibraryConfig;
+  ///If this library is platform aware, this represents the platform config, otherwise this is null.
+  final DynamicLibraryConfig? dynamicLibraryConfig;
 
   /// Optional 'library' directive in the generated file.
-  final String libraryName;
+  final String? libraryName;
 
   /// Optional 'part of' directive in the generated file.
-  final String partOf;
+  final String? partOf;
 
-  /// Optional imported URIs.
+  /// Optional imported URIs. May be empty nut never null.
   final Set<ImportedUri> importedUris;
 
-  /// Optional 'part' directives in the generated file.
+  /// Optional 'part' directives in the generated file. May be empty nut never null.
   final Set<String> parts;
 
   /// Elements.
   final List<Element> elements;
 
+  static const String dynamicLibraryIdentifier = '_dynamicLibrary';
+
   ///The default constructor, which is not platform aware.
   ///
   ///The dynamic library will be created using the `DynamicLibrary.open` method and the given `dynamicLibraryPath`.
   const Library({
-    @required this.dynamicLibraryPath,
-    @required this.elements,
-    this.libraryName,
+    required this.dynamicLibraryPath,
+    required this.elements,
+    String? containerClassName,
+    String? libraryName,
     this.partOf,
     this.preamble = '// AUTOMATICALLY GENERATED. DO NOT EDIT.',
     this.importedUris = const {},
     this.parts = const {},
-    this.dynamicLibraryIdentifier = '_dynamicLibrary',
   })  : dynamicLibraryConfig = null,
-        customLoadCode = null;
+        customLoadCode = null,
+        libraryName = libraryName,
+        containerClassName =
+            containerClassName ?? ((libraryName ?? '') + 'FunctionsAndGlobals');
 
   ///Creates a library which is platform aware, meaning that the creation of the underlying dynamic library can depend on the platform.
   const Library.platformAware({
-    @required this.dynamicLibraryConfig,
-    @required this.elements,
-    this.libraryName,
+    required this.dynamicLibraryConfig,
+    required this.elements,
+    String? containerClassName,
+    String? libraryName,
     this.partOf,
     this.preamble = '// AUTOMATICALLY GENERATED. DO NOT EDIT.',
     this.importedUris = const {},
     this.parts = const {},
-    this.dynamicLibraryIdentifier = '_dynamicLibrary',
   })  : dynamicLibraryPath = null,
-        customLoadCode = null;
+        customLoadCode = null,
+        libraryName = libraryName,
+        containerClassName =
+            containerClassName ?? ((libraryName ?? '') + 'FunctionsAndGlobals');
 
   ///Creates a library where the underlying dynamic library is explicitly loaded using the given `customLoadCode`.
   ///
   ///`customLoadCode` must be valid dart code and will be prefixed with "ffi.DynamicLibrary _open(){\n" and surfixed with "\n}".
   ///In other words, `customLoadCode` is the method body of a method with signatrure "DynamicLibrary _open()".
   const Library.customLoadCode({
-    @required this.customLoadCode,
-    @required this.elements,
-    this.libraryName,
+    required this.customLoadCode,
+    required this.elements,
+    String? containerClassName,
+    String? libraryName,
     this.partOf,
     this.preamble = '// AUTOMATICALLY GENERATED. DO NOT EDIT.',
     this.importedUris = const {},
     this.parts = const {},
-    this.dynamicLibraryIdentifier = '_dynamicLibrary',
   })  : dynamicLibraryPath = null,
-        dynamicLibraryConfig = null;
+        dynamicLibraryConfig = null,
+        libraryName = libraryName,
+        containerClassName =
+            containerClassName ?? ((libraryName ?? '') + 'FunctionsAndGlobals');
 
   ///Creates a library without caring about the underlying library. You have to set it manually using the init() function of the generated file at runtime.
   const Library.withoutLoading({
-    @required this.elements,
-    this.libraryName,
+    required this.elements,
+    String? containerClassName,
+    String? libraryName,
     this.partOf,
     this.preamble = '// AUTOMATICALLY GENERATED. DO NOT EDIT.',
     this.importedUris = const {},
     this.parts = const {},
-    this.dynamicLibraryIdentifier = '_dynamicLibrary',
   })  : dynamicLibraryPath = null,
         dynamicLibraryConfig = null,
-        customLoadCode = null;
+        customLoadCode = null,
+        libraryName = libraryName,
+        containerClassName =
+            containerClassName ?? ((libraryName ?? '') + 'FunctionsAndGlobals');
 
   bool get _platformAware => dynamicLibraryConfig != null;
 
@@ -143,27 +159,19 @@ class Library {
       }
       w.write('\n');
     }
-    w.write('/// Dynamic library\n');
-    if (_withoutLoading) {
-      w.write('ffi.DynamicLibrary ${dynamicLibraryIdentifier};');
-      w.write('\n\n');
-      w.write(
-          '''/// Initialises the generated code using `library`. This must be the first call to this file.
-void init(ffi.DynamicLibrary library){
-    ${dynamicLibraryIdentifier}=library;
-}
-''');
-    } else if (_customLoadCode) {
-      w.write(
-          'final ffi.DynamicLibrary ${dynamicLibraryIdentifier} = _open();');
-      w.write('\n');
+
+    // Outer elements, meaning things not belonging into a class
+    for (var element in elements) {
+      element.generateOuterSource(w, this);
+    }
+
+    w.write('\n');
+    if (_customLoadCode) {
       w.write('ffi.DynamicLibrary _open(){\n');
-      w.write(customLoadCode);
+      w.write(customLoadCode!);
       w.write('\n}');
     } else if (_platformAware) {
-      w.write(
-          'final ffi.DynamicLibrary ${dynamicLibraryIdentifier} = _open();');
-      w.write('\n');
+      final dynamicLibraryConfig = this.dynamicLibraryConfig!;
       w.write('ffi.DynamicLibrary _open(){\n\t');
       if (dynamicLibraryConfig.windows != null) {
         w.write(
@@ -194,16 +202,47 @@ void init(ffi.DynamicLibrary library){
           : 'return ffi.${dynamicLibraryConfig.other};\n';
       w.write(other);
       w.write('}');
-    } else {
-      w.write(
-          'final ffi.DynamicLibrary ${dynamicLibraryIdentifier} = ffi.DynamicLibrary.open(\n');
+    } else if (!_withoutLoading) {
+      w.write('ffi.DynamicLibrary _open() => ffi.DynamicLibrary.open(\n');
       w.write('  \'${dynamicLibraryPath}\',\n');
       w.write(');\n');
     }
 
-    for (var element in elements) {
-      element.generateSource(w, this);
+    if (!_withoutLoading) {
+      w.write('/// Dynamic library\n');
+      w.write(
+          'final ffi.DynamicLibrary ${dynamicLibraryIdentifier} = _open();');
     }
+
+    w.write('class $containerClassName {\n');
+
+    // Class constructor
+    w.write('$containerClassName(');
+    if (_withoutLoading) {
+      w.write('ffi.DynamicLibrary $dynamicLibraryIdentifier');
+    }
+    w.write(')');
+    var first = true;
+    var needSeparator = true;
+    for (var element in elements) {
+      if (needSeparator) {
+        if (first) {
+          first = false;
+          w.write(':\n');
+        } else {
+          w.write(',\n');
+        }
+      }
+      needSeparator = element.generateConstructorSource(w, this);
+    }
+    w.write(';\n');
+    w.write('\n');
+    // Inner elements, the things that belong into a class
+    for (var element in elements) {
+      element.generateInnerSource(w, this);
+    }
+
+    w.write('}');
   }
 
   @override
@@ -220,9 +259,11 @@ abstract class Element {
   final String name;
 
   /// Optional documentation of this element
-  final String documentation;
+  final String? documentation;
 
-  const Element({@required this.name, this.documentation});
+  const Element({required this.name, this.documentation});
 
-  void generateSource(DartSourceWriter w, Library library);
+  void generateOuterSource(DartSourceWriter w, Library library);
+  void generateInnerSource(DartSourceWriter w, Library library);
+  bool generateConstructorSource(DartSourceWriter w, Library library);
 }

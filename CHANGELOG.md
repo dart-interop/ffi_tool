@@ -1,3 +1,9 @@
+# 0.4.0
+  * BREAKING: Null Safety
+  * BREAKING: Removed dependency on the ffi package since dart:ffi is stable now (since dart 2.12)
+  * BREAKING: Removed Utf8 type, use Uint8 instead
+  * Added Opaque type
+
 # 0.3.0
   * Configure how a dynamic library should be loaded depending on the platform,
     explicitly give the load code, or make the user responsible for loading at runtime.

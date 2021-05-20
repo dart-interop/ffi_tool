@@ -1,4 +1,4 @@
-// Copyright (c) 2019 ffi_tool authors.
+// Copyright (c) 2021 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the 'Software'), to deal
@@ -18,8 +18,6 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-import 'package:meta/meta.dart';
-
 import 'library.dart';
 import 'dart_source_writer.dart';
 
@@ -27,24 +25,32 @@ import 'dart_source_writer.dart';
 class Global extends Element {
   final String type;
   const Global(
-      {@required String name, @required this.type, String documentation})
+      {required String name, required this.type, String? documentation})
       : super(name: name, documentation: documentation);
 
   @override
-  void generateSource(DartSourceWriter w, Library library) {
+  void generateInnerSource(DartSourceWriter w, Library library) {
     final dartType = w.getDartType(type);
-    final cType = w.getCType(type);
     w.write('\n');
-        if (documentation == null) {
+    if (documentation == null) {
       w.write('/// C global `$name`.\n');
     } else {
       w.write('/// ');
-      w.writeAll(documentation.split('\n'), '\n/// ');
+      w.writeAll(documentation!.split('\n'), '\n/// ');
       w.write('\n');
     }
-    w.write(
-        'final $dartType $name = ${library.dynamicLibraryIdentifier}.lookup<$cType>(\n');
+    w.write('final $dartType $name;\n');
+  }
+
+  @override
+  void generateOuterSource(DartSourceWriter w, Library library) {}
+
+  @override
+  bool generateConstructorSource(DartSourceWriter w, Library library) {
+    final cType = w.getCType(type);
+    w.write('$name = ${Library.dynamicLibraryIdentifier}.lookup<$cType>(\n');
     w.write('  \'$name\',\n');
-    w.write(').value;\n');
+    w.write(').value\n');
+    return true;
   }
 }

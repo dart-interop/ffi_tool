@@ -1,4 +1,4 @@
-// Copyright (c) 2020 ffi_tool authors.
+// Copyright (c) 2021 ffi_tool authors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,23 +18,10 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
 // OR OTHER DEALINGS IN THE SOFTWARE.
 
-import 'package:meta/meta.dart';
-
 /// Lowercase definition names to mappings.
 const _types = <String, _Type>{
   '*void': _Type(ffi: 'ffi.Pointer', dart: 'ffi.Pointer'),
   'void': _Type(ffi: 'ffi.Void', dart: 'void'),
-
-  '*utf8': _Type(
-    ffi: 'ffi.Pointer<ffi.Utf8>',
-    dart: 'ffi.Pointer<ffi.Utf8>',
-    importInfo: ImportedUri('package:ffi/ffi.dart', prefix: 'ffi'),
-  ),
-  '*utf16': _Type(
-    ffi: 'ffi.Pointer<ffi.Utf16>',
-    dart: 'ffi.Pointer<ffi.Utf16>',
-    importInfo: ImportedUri('package:ffi/ffi.dart', prefix: 'ffi'),
-  ),
 
   'intptr': _Type(ffi: 'ffi.IntPtr', dart: 'int'),
 
@@ -57,9 +44,9 @@ const _types = <String, _Type>{
 };
 
 class DartSourceWriter {
-  String libraryName;
-  String partOf;
-  String preamble;
+  String? libraryName;
+  String? partOf;
+  String? preamble;
   final Set<ImportedUri> imports = {};
   final Set<String> parts = {};
   final StringBuffer _sb = StringBuffer();
@@ -72,9 +59,6 @@ class DartSourceWriter {
   ///   * '*void' --> 'Pointer'
   ///   * 'void' --> 'Void'
   String getCType(String name) {
-    if (name == null) {
-      throw ArgumentError.value(name);
-    }
     final type = _types[name.toLowerCase()];
     if (type != null) {
       final importUri = type.importInfo;
@@ -96,9 +80,6 @@ class DartSourceWriter {
   ///   * 'Int64' --> 'int'
   ///   * '*CFString' --> 'Pointer<CFString>'
   String getDartType(String name) {
-    if (name == null) {
-      throw ArgumentError.notNull();
-    }
     final type = _types[name.toLowerCase()];
     if (type != null) {
       final importUri = type.importInfo;
@@ -120,7 +101,7 @@ class DartSourceWriter {
   ///   * '*CFString' --> 'Pointer<CFString>'
   ///   * '*void' --> 'Pointer'
   ///   * 'void' --> 'Void'
-  String getPropertyAnnotationType(String name) {
+  String? getPropertyAnnotationType(String name) {
     if (name.startsWith('*')) {
       return 'ffi.Pointer';
     }
@@ -195,9 +176,9 @@ class DartSourceWriter {
 /// Describes an imported Dart package.
 class ImportedUri implements Comparable<ImportedUri> {
   final String uri;
-  final String prefix;
-  final String show;
-  final String hide;
+  final String? prefix;
+  final String? show;
+  final String? hide;
 
   const ImportedUri(this.uri, {this.prefix, this.show, this.hide});
 
@@ -223,6 +204,6 @@ class ImportedUri implements Comparable<ImportedUri> {
 class _Type {
   final String ffi;
   final String dart;
-  final ImportedUri importInfo;
-  const _Type({@required this.ffi, @required this.dart, this.importInfo});
+  final ImportedUri? importInfo;
+  const _Type({required this.ffi, required this.dart, this.importInfo});
 }
